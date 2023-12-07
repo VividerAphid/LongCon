@@ -1,4 +1,4 @@
-var map = randomGen(1500,1500);//loadTestSet();
+var map = randomGen(3000,3000);//loadTestSet();
 var factions = loadTestFactions();
 var players = [];
 var player1 = new player(1, "Player");

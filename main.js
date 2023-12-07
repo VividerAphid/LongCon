@@ -60,8 +60,8 @@ function render(art, map, ships){
 }
 
 function uiSetup(map, player, art, ships){
-    gameboard.width = 1500;
-    gameboard.height = 1500;
+    gameboard.width = 3000;
+    gameboard.height = 3000;
     gameboard.onclick = function(event){
         event.preventDefault();
         checkHit(map, player, art, ships);
