@@ -60,8 +60,8 @@ function render(art, map, ships){
 }
 
 function uiSetup(map, player, art, ships){
-    gameboard.width = 3000;
-    gameboard.height = 3000;
+    gameboard.width = 5000;
+    gameboard.height = 5000;
     gameboard.onclick = function(event){
         event.preventDefault();
         checkHit(map, player, art, ships);
@@ -105,8 +105,7 @@ function loadTestFactions(){
 }
 
 function getAttackValue(map, play){
-    console.log("attacking");
-    let defPercent = .3;
+    let defPercent = play.attackStrength;
     let planPercent = .5;
     let owned = play.getOwnedIds(map);
     let sorted = owned.slice();
@@ -121,32 +120,34 @@ function getAttackValue(map, play){
             hitValue += scrapeVal;
             map[sorted[r]].defense -= scrapeVal;
         }
-        else{
-            r--;
-        }
+        // else{
+        //     r--;
+        // }
     }
     return hitValue;
 }
 
 function checkHit(map, player, art, ships){
-    console.log("checkhit");
+    //console.log("checkhit");
     let canvRect = gameboard.getBoundingClientRect();
 	let x = (event.clientX - canvRect.left);
 	let y = (event.clientY - canvRect.top);
     let r;
     let reps = map.length;
 		for(r=0; r<reps;r++){
-		if (x >= (map[r].x - map[r].radius*2) && x <= (map[r].x + map[r].radius*2)){
-			if (y >= (map[r].y - map[r].radius*2) && y <= (map[r].y + map[r].radius*2)){
+        let clickRad = map[r].radius*2;
+        if(clickRad < 10) clickRad = 10;
+		if (x >= (map[r].x - clickRad) && x <= (map[r].x + clickRad)){
+			if (y >= (map[r].y - clickRad) && y <= (map[r].y + clickRad)){
                 if(map[r] != player.ship.at){
                     if(map[r].faction.id == player.faction.id){
-                        console.log("flying!");
+                        //console.log("flying!");
                         player.ship.fly(map[r]);
                         render(art, map, ships);
                     }
                     else{
                         if(checkProximity(map[r], map, player.faction.id)){
-                            console.log("flying!");
+                            //console.log("flying!");
                             player.ship.fly(map[r]);
                             render(art, map, ships);
                         }
@@ -180,18 +181,27 @@ function checkProximity(targ, map, id){
 
 function move(map, target, player){
     let stack = getAttackValue(map, player);
+    let moveEvent = {target: target, attacker: player, defender: 0, type: 0};
     if (target.faction.id == player.faction.id){
         target.defense += stack;
+        moveEvent.defender = player;
+        moveEvent.type = "defend";
     }
     else{
         if(target.defense < stack){
+            moveEvent.defender = target.owner;
+            moveEvent.type = "capture";
             target.defense = stack - target.defense;
             target.owner = player;
         }
         else{
             target.defense -= stack;
+            moveEvent.defender = target.owner;
+            moveEvent.type = "attack";
         }
     }
+    console.log(moveEvent);
+    return moveEvent;
 }
 
 function attackRefresh(players){

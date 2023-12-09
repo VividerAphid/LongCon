@@ -5,6 +5,8 @@ class player{
         this.attacked = false;
         this.faction = {};
         this.ship = {};
+        this.attackStrength = .3; //High by default
+        this.hitPower = 100;
     }
     get color(){
         return this.faction.color;
