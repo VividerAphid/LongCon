@@ -135,3 +135,7 @@ function verifyAllConnected(map){
 
     return map;
 }
+
+function genConsts(map){
+    
+}

@@ -19,12 +19,6 @@ class player{
     }
 }
 
-class bot extends player{
-    constructor(){
-
-    }
-}
-
 class star{
     constructor(id, x, y, name, prod, cons){
         this.id = id;
