@@ -136,6 +136,53 @@ function verifyAllConnected(map){
     return map;
 }
 
-function genConsts(map){
-    
+function genConsts(map, minSize, maxSize){
+    let consts = [];
+    let pairs = [];
+    let visited = {};
+    let sources = [];
+    let candidates;
+    for(let r = 0; r<map.length; r++){
+        sources.push(r);
+    }
+    while(sources.length){
+        let pick = Math.floor(Math.random()*sources.length);
+        sources[pick] = sources[sources.length-1];
+        sources.pop();
+        if(visited[pick]) continue;
+        let tempConst = [];
+        let size = 0;
+        candidates = [[pick, pick]];
+        while(candidates.length && size < maxSize){
+            let s = Math.floor(Math.random()*candidates.length);
+            let e = candidates[s];
+            candidates.pop();
+            tempConst.push(e);
+            if(visited[e[1]]){
+                continue;
+            }
+            size += 1;
+            visited[e[1]] = true;
+            let cons = map[e[1]].connections;
+            for(let t = 0; t < cons.length; t+=1){
+                if(!visited[cons[t]]){
+                    candidates.push([e[1], cons[t]]);
+                }
+            }
+        }
+        if(size >= minSize){
+            pairs.push(tempConst.slice(1));
+        }
+    }
+    for(let x = 0; x < pairs.length; x++){
+        let con = pairs[x];
+        let list = [];
+        for(let y = 0; y < con.length; y++){
+            list.push(con[y][0]);
+            list.push(con[y][1]);
+        }
+        list = removeDupes(list);
+        consts.push(list);
+    }
+    return consts;
 }

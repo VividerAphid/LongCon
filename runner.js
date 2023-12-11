@@ -1,27 +1,36 @@
-var map = randomGen(3000,3000);//loadTestSet();
-var factions = loadTestFactions();
-var players = [];
+var gameData = new game();
+gameData.map = randomGen(3000,3000);
+gameData.factions = loadTestFactions(10);
+let plaShipPack = loadTestPlayersAndShips(gameData.factions);
+gameData.players = plaShipPack[0];
+gameData.ships = plaShipPack[1];
 var player1 = new player(1, "Player");
-players.push(player1);
-player1.faction = factions[0];
-factions[0].players[0] = player1;
-map = loadDefenseAndNeut(map);
-map = pickSpawns(factions, map, 3);
-//console.log(map);
+player1.faction = gameData.factions[0];
+player1.ship = gameData.ships[0];
+gameData.factions[0].players[0] = player1;
+gameData.players[0] = player1;
+gameData.humanPlayer = player1;
+gameData.map = loadDefenseAndNeut(gameData.map);
+gameData.map = pickSpawns(gameData, 3);
+setShipSpawns(gameData);
 
-var arty = new artist(gameboard.getContext("2d"));
-var ships = [new ship(1, player1)];
-ships[0].setStart(player1.faction.getOwned(map)[0]);
-player1.ship = ships[0];
-uiSetup(map, player1, arty, ships);
-render(arty, map, ships);
+gameData.consts = genConsts(gameData.map, 5, 7);
+
+botStart(gameData);
+
+gameData.artist = new artist(gameboard.getContext("2d"));
+uiSetup(gameData);
+render(gameData);
 
 var defenseIntTime = 60000;//3600000;
 var flightIntTime = 1000;
 var attackIntTime = 1000;
+var botIntTime = 5000;
 var defenseUpdater = "";
 var flightUpdater = "";
 var attackUpdater = "";
-defenseUpdater = setInterval(hourRefresh, defenseIntTime, map, arty, ships);
-flightUpdater = setInterval(flightUpdate, flightIntTime, arty, map, ships);
-attackUpdater = setInterval(attackRefresh, attackIntTime, players);
+var botCaller = "";
+defenseUpdater = setInterval(hourRefresh, defenseIntTime, gameData);
+flightUpdater = setInterval(flightUpdate, flightIntTime, gameData);
+attackUpdater = setInterval(attackRefresh, attackIntTime, gameData.players);
+botCaller = setInterval(botMove, botIntTime, gameData);

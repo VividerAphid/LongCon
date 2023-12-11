@@ -7,6 +7,7 @@ class player{
         this.ship = {};
         this.attackStrength = .3; //High by default
         this.hitPower = 100;
+        this.isBot = false;
     }
     get color(){
         return this.faction.color;
@@ -31,6 +32,7 @@ class star{
         this.connections = cons || [];
         this.constShowing = false;
         this.radius = 0;
+        this.labelOffsets = {dXOffset: 15, dYOffset: 25, pXOffset: 10, pYOffset: 35};
         this.calcRad();
     }
     get color(){
@@ -45,14 +47,20 @@ class star{
     }
     calcRad(){
         this.radius = 10*(this.prod/100);
+        // this.labelOffsets.dXOffset = 15 * (this.prod / 10);
+        // this.labelOffsets.dYOffset = 25 * (this.prod / 10);
+        // this.labelOffsets.pXOffset = 10 * (this.prod / 10);
+        // this.labelOffsets.pYOffset = 35 * (this.prod / 10);
     }
     drawStar(art){
         art.drawStar(this.x, this.y, this.color, this.radius);
     }
     drawLabels(art){
         let font = "bold 15px Consolas";
-        art.drawText(this.x-15, this.y-25, this.defense, font, this.color); //Defense label
-        art.drawText(this.x-10, this.y+35, "+"+this.prod, font, this.color); //Prod label
+        let constMult = "";
+        if(this.constShowing){constMult = " (x2)"}
+        art.drawText(this.x-this.labelOffsets.dXOffset, this.y-this.labelOffsets.dYOffset, this.defense, font, this.color); //Defense label
+        art.drawText(this.x-this.labelOffsets.pXOffset, this.y+this.labelOffsets.pYOffset, "+"+this.prod + constMult, font, this.color); //Prod label
     }
     drawConnections(art, map){
         let reps = this.connections.length;
@@ -101,6 +109,9 @@ class ship{
     get color(){
         return this.player.color;
     }
+    get faction(){
+        return this.player.faction;
+    }
 
     setStart(star){
         this.x = star.x + star.radius*2;
@@ -140,7 +151,7 @@ class ship{
     land(){
         this.flying = false;
         this.at = this.target;
-        console.log("Landed!");
+        //console.log("Landed!");
     }
 
     calcDirection(){
@@ -183,5 +194,17 @@ class faction{
             }
         }
         return owned;
+    }
+}
+
+class game{
+    constructor(){
+        this.map = [];
+        this.consts = [];
+        this.factions = [];
+        this.players = [];
+        this.humanPlayer = {};
+        this.ships = [];
+        this.artist = {};
     }
 }

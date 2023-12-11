@@ -16,6 +16,67 @@ function loadTestSet(){
     return map;
 }
 
+function testLightConsts(gameData){
+    for(let r = 0; r < gameData.consts.length; r++){
+        let curConst = gameData.consts[r];
+        //console.log(curConst);
+        for(let t = 0; t < curConst.length; t++){
+            //console.log(curConst[t][0]);
+            gameData.map[curConst[t][0]].constShowing = true;
+            gameData.map[curConst[t][1]].constShowing = true;
+        }
+    }
+}
+
+function testFillMap(map, faction){
+    for(let r = 0; r < map.length; r++){
+        map[r].owner = faction.players[0];
+    }
+}
+
+function loadTestFactions(count){
+    let factions = [];
+    let charSet = ['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l', 'm', 'n', 'o', 'p', 'q', 'r', 's', 't', 'u', 'v',
+        'w', 'x', 'y', 'z', '1', '2', '3', '4', '5', '6', '7', '8', '9', '0'];
+    for(let r = 0; r < count; r++){
+        let rc = Math.floor(Math.random()*256);
+        let gc = Math.floor(Math.random()*256);
+        let bc = Math.floor(Math.random()*256);
+        let color = "rgb("+ rc+ ","+gc+","+bc+")";
+        let charPicks = [Math.floor(Math.random()*charSet.length), Math.floor(Math.random()*charSet.length)];
+        let chars = charSet[charPicks[0]] + charSet[charPicks[1]];
+        factions.push(new faction(r+1, "Fac"+r+1, {color: color, chars: chars}));
+        factions[r].players.push(new player(r+1, "Pla" + r+1));
+        factions[r].players[0].faction = factions[r];
+    }
+    console.log(factions);
+    return factions;
+}
+
+function loadTestPlayersAndShips(factions){
+    let players = [];
+    let ships = [];
+    for(let r = 0; r < factions.length; r++){
+        players.push(new basicBot(r+1, "Bot"+(r+1)));
+        factions[r].players.push(players[r]);
+        players[r].faction = factions[r];
+        ships.push(new ship(r+1, players[r]));
+        players[r].ship = ships[r];
+    }
+    return [players, ships];
+}
+
+function setShipSpawns(gameData){
+    let map = gameData.map;
+    let ships = gameData.ships;
+    for(let r = 0; r < ships.length; r++){
+        let list = ships[r].player.getOwned(map);
+        let pick = Math.floor(Math.random()*list.length);
+        let spawn = list[pick];
+        ships[r].setStart(spawn);
+    }
+}
+
 function loadDefenseAndNeut(map){
     let neutPlayer = new player(0, "neutral");
     let neutFaction = new faction(0, "neutralF", {color: "#fff", chars: ""});
@@ -30,78 +91,79 @@ function loadDefenseAndNeut(map){
 function addDefense(map){
     for(let r = 0; r < map.length; r++){
         if(map[r].owner.id > 0){
-            map[r].defense += map[r].prod;
+            let up = map[r].prod;
+            if(map[r].constShowing){
+                up += up;
+            }
+            map[r].defense += up;
         }
     }
 }
 
-function hourRefresh(map, art, ships){
-    addDefense(map);
-    render(art, map, ships);
-}
-
-function render(art, map, ships){
-    art.fillRect(0, 0, gameboard.width, gameboard.height, "#222", "#222");
-    for(let r = 0; r < map.length; r++){
-        map[r].drawConnections(art, map);
+function render(gameData){
+    gameData.artist.fillRect(0, 0, gameboard.width, gameboard.height, "#222", "#222");
+    for(let r = 0; r < gameData.map.length; r++){
+        gameData.map[r].drawConnections(gameData.artist, gameData.map);
     }
     
-    for(let r = 0; r < map.length; r++){
-        map[r].drawStar(art);
+    for(let r = 0; r < gameData.map.length; r++){
+        gameData.map[r].drawStar(gameData.artist);
     }
     
-    for(let r = 0; r < map.length; r++){
-        map[r].drawLabels(art);
+    for(let r = 0; r < gameData.map.length; r++){
+        gameData.map[r].drawLabels(gameData.artist);
     }
     
-    for(let r = 0; r < ships.length; r++){
-        ships[r].draw(art);
+    for(let r = 0; r < gameData.ships.length; r++){
+        if(gameData.ships[r].faction.id == gameData.humanPlayer.faction.id || checkProximity(gameData.ships[r].at, gameData.map, gameData.humanPlayer.faction.id) )
+        gameData.ships[r].draw(gameData.artist);
     }
 }
 
-function uiSetup(map, player, art, ships){
+function uiSetup(gameData){
     gameboard.width = 3000;
     gameboard.height = 3000;
     gameboard.onclick = function(event){
         event.preventDefault();
-        checkHit(map, player, art, ships);
+        checkHit(gameData);
     }
 }
 
-function pickSpawns(factions, map, spawnCount){
+function pickSpawns(gameData, spawnCount){
     for(let s = 0; s < spawnCount; s++){
         let prodPick = Math.floor(Math.random()*86) + 15;
         let defensePick = Math.floor(Math.random()*1500);
-        for(let r = 0; r < factions.length; r++){
-            let pick = Math.floor(Math.random()*map.length);
-            if(map[pick].owner.id == 0){
-                let playerPick = Math.floor(Math.random()*factions[r].players.length);
-                map[pick].owner = factions[r].players[playerPick];
-                map[pick].defense = defensePick;
-                map[pick].production = prodPick;
+        for(let r = 0; r < gameData.factions.length; r++){
+            let pick = Math.floor(Math.random()*gameData.map.length);
+            if(gameData.map[pick].owner.id == 0){
+                let playerPick = Math.floor(Math.random()*gameData.factions[r].players.length);
+                gameData.map[pick].owner = gameData.factions[r].players[playerPick];
+                gameData.map[pick].defense = defensePick;
+                gameData.map[pick].production = prodPick;
             }
         }
     }
-    return map;  
+    return gameData.map;  
 }
 
-function loadTestFactions(){
-    let factions = [];
-    let charSet = ['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l', 'm', 'n', 'o', 'p', 'q', 'r', 's', 't', 'u', 'v',
-        'w', 'x', 'y', 'z', '1', '2', '3', '4', '5', '6', '7', '8', '9', '0'];
-    for(let r = 0; r < 10; r++){
-        let rc = Math.floor(Math.random()*256);
-        let gc = Math.floor(Math.random()*256);
-        let bc = Math.floor(Math.random()*256);
-        let color = "rgb("+ rc+ ","+gc+","+bc+")";
-        let charPicks = [Math.floor(Math.random()*charSet.length), Math.floor(Math.random()*charSet.length)];
-        let chars = charSet[charPicks[0]] + charSet[charPicks[1]];
-        factions.push(new faction(r+1, "Fac"+r+1, {color: color, chars: chars}));
-        factions[r].players.push(new player(r+1, "Pla" + r+1));
-        factions[r].players[0].faction = factions[r];
+function checkConstLight(gameData){
+    let map = gameData.map;
+    let consts = gameData.consts;
+    for(let r = 0; r < consts.length; r++){
+        let con = consts[r];
+        let on = false;
+        if(map[con[0]].owner.faction.id != 0){
+            on = true;
+            for(let t = 0; t < con.length; t++){
+                if(map[con[0]].owner.faction.id != map[con[t]].owner.faction.id){
+                    on = false;
+                }
+            }
+        }
+        for(let c = 0; c < con.length; c++){
+            map[con[c]].constShowing = on;
+        }
     }
-    console.log(factions);
-    return factions;
 }
 
 function getAttackValue(map, play){
@@ -127,12 +189,14 @@ function getAttackValue(map, play){
     return hitValue;
 }
 
-function checkHit(map, player, art, ships){
+function checkHit(gameData){
     //console.log("checkhit");
     let canvRect = gameboard.getBoundingClientRect();
 	let x = (event.clientX - canvRect.left);
 	let y = (event.clientY - canvRect.top);
     let r;
+    let map = gameData.map;
+    let player = gameData.humanPlayer;
     let reps = map.length;
 		for(r=0; r<reps;r++){
         let clickRad = map[r].radius*2;
@@ -143,21 +207,22 @@ function checkHit(map, player, art, ships){
                     if(map[r].faction.id == player.faction.id){
                         //console.log("flying!");
                         player.ship.fly(map[r]);
-                        render(art, map, ships);
+                        render(gameData);
                     }
                     else{
                         if(checkProximity(map[r], map, player.faction.id)){
                             //console.log("flying!");
                             player.ship.fly(map[r]);
-                            render(art, map, ships);
+                            render(gameData);
                         }
                     }
                     break;
                 }
                 else{
                     if(player.attacked == false){
-                        move(map, map[r], player);
-                        render(art, map, ships);
+                        let moveEvent = move(gameData, map[r], player);
+                        botMapUpdate(gameData, moveEvent);
+                        render(gameData);
                     }
                 }
 			}
@@ -179,7 +244,8 @@ function checkProximity(targ, map, id){
 	return false;
 }
 
-function move(map, target, player){
+function move(gameData, target, player){
+    let map = gameData.map;
     let stack = getAttackValue(map, player);
     let moveEvent = {target: target, attacker: player, defender: 0, type: 0};
     if (target.faction.id == player.faction.id){
@@ -193,6 +259,7 @@ function move(map, target, player){
             moveEvent.type = "capture";
             target.defense = stack - target.defense;
             target.owner = player;
+            checkConstLight(gameData);
         }
         else{
             target.defense -= stack;
@@ -200,8 +267,45 @@ function move(map, target, player){
             moveEvent.type = "attack";
         }
     }
-    console.log(moveEvent);
+    
     return moveEvent;
+}
+
+function botStart(gameData){
+    let players = gameData.players;
+    for(let r = 0; r < players.length; r++){
+        if(players[r].isBot){
+            players[r].onStart(gameData.map);
+        }
+    }
+}
+
+function botMapUpdate(gameData, moveEvent){
+    let players = gameData.players;
+    for(let r = 0; r < players.length; r++){
+        if(players[r].isBot){
+            players[r].mapUpdate(gameData.map, moveEvent);
+        }
+    }
+}
+
+function botMove(gameData){
+    let players = gameData.players;
+    let moveEvent;
+    for(let r = 0; r < players.length; r++){
+        if(players[r].isBot && players[r].getOwned(gameData.map).length > 0){
+            let movePick = players[r].makeMove(gameData.map);
+            if(movePick != "fly"){
+                moveEvent = move(gameData, movePick, players[r]);
+                botMapUpdate(gameData, moveEvent);
+            }      
+        }
+    }
+}
+
+function hourRefresh(gameData){
+    addDefense(gameData.map);
+    render(gameData);
 }
 
 function attackRefresh(players){
@@ -210,11 +314,12 @@ function attackRefresh(players){
     }
 }
 
-function flightUpdate(art, map, ships){
+function flightUpdate(gameData){
+    let ships = gameData.ships; 
     for(let r = 0; r < ships.length; r++){
         if(ships[r].flying){
             ships[r].stepToTarget();
         }
     }
-    render(art, map, ships);
+    render(gameData);
 }
