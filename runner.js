@@ -23,7 +23,7 @@ uiSetup(gameData);
 render(gameData);
 
 var defenseIntTime = 60000;//3600000;
-var flightIntTime = 1000;
+var flightIntTime = 1000;//1000;
 var attackIntTime = 1000;
 var botIntTime = 5000;
 var defenseUpdater = "";

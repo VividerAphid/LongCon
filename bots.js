@@ -28,7 +28,9 @@ class basicBot extends bot{
     mapUpdate(map, moveEvent){
         if(moveEvent.target.faction.id == this.faction.id && moveEvent.type == "capture"){
             let stillInProxy = checkProximity(this.ship.at, map, this.faction.id);
+            //console.log("Proxy check = " + stillInProxy);
             if(!stillInProxy){
+                //console.log("Lost proxy!");
                 this.updateTargets(map);
                 this.pickNewTarget(map);
             }
@@ -81,16 +83,18 @@ class basicBot extends bot{
                 }
             }
         }
+        //console.log(options);
         let distance = Infinity;
         let pick = -1;
         for(let r = 0; r < options.length; r++){
             let dist = findLengthPoints(this.ship.x, this.ship.y, options[r].x, options[r].y);
-            if(dist > distance){
+            if(dist < distance){
                 distance = dist;
                 pick = options[r];
             }
         }
-        this.targets.push(options.id);
+        this.targets.push(pick.id);
+        //console.log(this.targets);
     }
     
 }

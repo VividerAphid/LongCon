@@ -296,8 +296,10 @@ function botMove(gameData){
         if(players[r].isBot && players[r].getOwned(gameData.map).length > 0){
             let movePick = players[r].makeMove(gameData.map);
             if(movePick != "fly"){
-                moveEvent = move(gameData, movePick, players[r]);
-                botMapUpdate(gameData, moveEvent);
+                if(checkProximity(movePick, gameData.map, players[r].faction.id)){
+                    moveEvent = move(gameData, movePick, players[r]);
+                    botMapUpdate(gameData, moveEvent);
+                }
             }      
         }
     }
