@@ -16,7 +16,7 @@ setShipSpawns(gameData);
 
 gameData.consts = genConsts(gameData.map, 5, 7);
 
-gameData.botWar = true;
+gameData.botWar = false;
 botStart(gameData);
 
 gameData.artist = new artist(gameboard.getContext("2d"));
