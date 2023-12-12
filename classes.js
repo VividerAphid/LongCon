@@ -32,6 +32,7 @@ class star{
         this.connections = cons || [];
         this.constShowing = false;
         this.radius = 0;
+        this.constId = -1;
         this.labelOffsets = {dXOffset: 15, dYOffset: 25, pXOffset: 10, pYOffset: 35};
         this.calcRad();
     }
@@ -70,10 +71,10 @@ class star{
                 art.ctx.beginPath();
                 art.ctx.lineWidth = 3;
                 if(this.faction.id != 0 && this.faction.id == map[connectee].faction.id){
-                    if(this.constShowing == true && map[connectee].constShowing == true){
+                    if(this.constShowing == true && map[connectee].constShowing == true && this.constId == map[connectee].constId){
                         art.ctx.fillStyle = "#fff";
                         art.ctx.strokeStyle = "#fff";
-                        art.ctx.lineWidth = 9;
+                        art.ctx.lineWidth = 7;
                     }
                     else{
                         art.ctx.fillStyle = this.color;
@@ -206,5 +207,6 @@ class game{
         this.humanPlayer = {};
         this.ships = [];
         this.artist = {};
+        this.botWar = false;
     }
 }

@@ -115,8 +115,9 @@ function render(gameData){
     }
     
     for(let r = 0; r < gameData.ships.length; r++){
-        if(gameData.ships[r].faction.id == gameData.humanPlayer.faction.id || checkProximity(gameData.ships[r].at, gameData.map, gameData.humanPlayer.faction.id) )
-        gameData.ships[r].draw(gameData.artist);
+        if(gameData.ships[r].faction.id == gameData.humanPlayer.faction.id || checkProximity(gameData.ships[r].at, gameData.map, gameData.humanPlayer.faction.id) || gameData.botWar){
+                gameData.ships[r].draw(gameData.artist);
+            }   
     }
 }
 
@@ -162,6 +163,12 @@ function checkConstLight(gameData){
         }
         for(let c = 0; c < con.length; c++){
             map[con[c]].constShowing = on;
+            if(on){
+                map[con[c]].constId = r;
+            }
+            else{
+                map[con[c]].constId = -1;
+            }
         }
     }
 }
