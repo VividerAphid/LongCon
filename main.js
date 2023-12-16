@@ -53,15 +53,20 @@ function loadTestFactions(count){
     return factions;
 }
 
-function loadTestPlayersAndShips(factions){
+function loadTestPlayersAndShips(factions, perFaction){
+    let count = factions.length * perFaction;
     let players = [];
     let ships = [];
+    let idCount = 0;
     for(let r = 0; r < factions.length; r++){
-        players.push(new basicBot(r+1, "Bot"+(r+1)));
-        factions[r].players.push(players[r]);
-        players[r].faction = factions[r];
-        ships.push(new ship(r+1, players[r]));
-        players[r].ship = ships[r];
+        for(let p = 0; p < count / factions.length; p++){
+            players.push(new basicBot(idCount+1, "Bot"+(r+1)));
+            factions[r].players.push(players[idCount]);
+            players[idCount].faction = factions[r];
+            ships.push(new ship(idCount+1, players[idCount]));
+            players[idCount].ship = ships[idCount];
+            idCount++;
+        }
     }
     return [players, ships];
 }
@@ -77,12 +82,12 @@ function setShipSpawns(gameData){
     }
 }
 
-function loadDefenseAndNeut(map){
+function loadDefenseAndNeut(map, defenseCap){
     let neutPlayer = new player(0, "neutral");
     let neutFaction = new faction(0, "neutralF", {color: "#fff", chars: ""});
     neutPlayer.faction = neutFaction;
     for(let r = 0; r < map.length; r++){
-        map[r].defense = Math.floor(Math.random()* 1500);
+        map[r].defense = Math.floor(Math.random()* defenseCap);
         map[r].owner = neutPlayer;
     }
     return map;
@@ -112,11 +117,14 @@ function render(gameData){
     
     for(let r = 0; r < gameData.map.length; r++){
         gameData.map[r].drawLabels(gameData.artist);
+        if(gameData.debug){
+            gameData.map[r].drawDebugs(gameData.artist);
+        }
     }
     
     for(let r = 0; r < gameData.ships.length; r++){
-        if(gameData.ships[r].faction.id == gameData.humanPlayer.faction.id || checkProximity(gameData.ships[r].at, gameData.map, gameData.humanPlayer.faction.id) || gameData.botWar){
-                gameData.ships[r].draw(gameData.artist);
+        if(gameData.ships[r].faction.id == gameData.humanPlayer.faction.id || checkProximity(gameData.ships[r].at, gameData.map, gameData.humanPlayer.faction.id) || gameData.botWar){  
+            gameData.ships[r].draw(gameData.artist);
             }   
     }
 }
@@ -133,7 +141,7 @@ function uiSetup(gameData){
 function pickSpawns(gameData, spawnCount){
     for(let s = 0; s < spawnCount; s++){
         let prodPick = Math.floor(Math.random()*86) + 15;
-        let defensePick = Math.floor(Math.random()*1500);
+        let defensePick = Math.floor(Math.random()*1500) + (gameData.factions[0].players.length * 500);
         for(let r = 0; r < gameData.factions.length; r++){
             let pick = Math.floor(Math.random()*gameData.map.length);
             if(gameData.map[pick].owner.id == 0){
@@ -226,7 +234,7 @@ function checkHit(gameData){
                     break;
                 }
                 else{
-                    if(player.attacked == false){
+                    if(checkProximity(map[r], map, player.faction.id && player.attacked == false)){
                         let moveEvent = move(gameData, map[r], player);
                         botMapUpdate(gameData, moveEvent);
                         render(gameData);

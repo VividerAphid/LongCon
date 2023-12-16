@@ -8,6 +8,7 @@ class player{
         this.attackStrength = .3; //High by default
         this.hitPower = 100;
         this.isBot = false;
+        this.isDead = false;
     }
     get color(){
         return this.faction.color;
@@ -57,11 +58,13 @@ class star{
         art.drawStar(this.x, this.y, this.color, this.radius);
     }
     drawLabels(art){
-        let font = "bold 15px Consolas";
         let constMult = "";
         if(this.constShowing){constMult = " (x2)"}
-        art.drawText(this.x-this.labelOffsets.dXOffset, this.y-this.labelOffsets.dYOffset, this.defense, font, this.color); //Defense label
-        art.drawText(this.x-this.labelOffsets.pXOffset, this.y+this.labelOffsets.pYOffset, "+"+this.prod + constMult, font, this.color); //Prod label
+        art.drawText(this.x-this.labelOffsets.dXOffset, this.y-this.labelOffsets.dYOffset, this.defense, art.labelFont, this.color); //Defense label
+        art.drawText(this.x-this.labelOffsets.pXOffset, this.y+this.labelOffsets.pYOffset, "+"+this.prod + constMult, art.labelFont, this.color); //Prod label       
+    }
+    drawDebugs(art){
+        art.drawText(this.x-10, this.y, this.id, art.labelFont, "#f00");
     }
     drawConnections(art, map){
         let reps = this.connections.length;
