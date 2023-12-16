@@ -12,7 +12,7 @@ gameData.players[0] = player1;
 gameData.humanPlayer = player1;
 gameData.ships[0].player = player1;
 gameData.map = loadDefenseAndNeut(gameData.map, 1500);
-gameData.map = pickSpawns(gameData, 3);
+gameData.map = pickSpawns(gameData, 3, 250);
 setShipSpawns(gameData);
 
 gameData.consts = genConsts(gameData.map, 5, 7);
