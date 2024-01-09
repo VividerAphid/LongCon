@@ -1,6 +1,6 @@
 var gameData = new game();
 gameData.map = randomGen(3000, 3000);
-gameData.factions = loadTestFactions(10);
+gameData.factions = loadTestFactions(25);
 let plaShipPack = loadTestPlayersAndShips(gameData.factions, 5);
 gameData.players = plaShipPack[0];
 gameData.ships = plaShipPack[1];

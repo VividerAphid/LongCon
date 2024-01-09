@@ -43,9 +43,10 @@ function loadTestFactions(count){
         let gc = Math.floor(Math.random()*256);
         let bc = Math.floor(Math.random()*256);
         let color = "rgb("+ rc+ ","+gc+","+bc+")";
+        let inverse = "rgb("+ (255-rc) +","+(255-gc) +"," +(255-bc)+")";
         let charPicks = [Math.floor(Math.random()*charSet.length), Math.floor(Math.random()*charSet.length)];
         let chars = charSet[charPicks[0]] + charSet[charPicks[1]];
-        factions.push(new faction(r+1, "Fac"+r+1, {color: color, chars: chars}));
+        factions.push(new faction(r+1, "Fac"+r+1, {color: color, chars: chars, inverse: inverse}));
         factions[r].players.push(new player(r+1, "Pla" + r+1));
         factions[r].players[0].faction = factions[r];
     }
