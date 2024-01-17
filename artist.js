@@ -49,9 +49,9 @@ class artist{
         if(triangle.player.isBot == false){
             //console.log("drawing player");
             g.strokeStyle = "#fff";
-            g.lineWidth = 2;
+            g.lineWidth = 4;
             g.translate(scaledX, scaledY);
-            g.rotate(-triangle.direction);
+            //g.rotate(-triangle.direction);
             g.translate(-scaledX, -scaledY);
             g.beginPath();
 
@@ -60,6 +60,7 @@ class artist{
             g.lineTo(scaledX, scaledY+(height*this.scale));
 
             g.closePath();
+            g.stroke();
         }
         g.restore();
     }
