@@ -130,11 +130,11 @@ function render(gameData){
         if(gameData.ships[r].player == gameData.humanPlayer){
             if(gameData.humanPlayer.pointerOn){
                 gameData.artist.drawPointer(gameData.ships[r].x, gameData.ships[r].y, "#fff");
-                gameData.humanPlayer.pointerOn = false;
+                //gameData.humanPlayer.pointerOn = false;
             }
-            else{
-                gameData.humanPlayer.pointerOn = true;
-            }
+            // else{
+            //     gameData.humanPlayer.pointerOn = true;
+            // }
         } 
     }
 }
@@ -342,6 +342,7 @@ function attackRefresh(players){
 }
 
 function flightUpdate(gameData){
+    gameData.humanPlayer.pointerOn = !gameData.humanPlayer.pointerOn;
     let ships = gameData.ships; 
     for(let r = 0; r < ships.length; r++){
         if(ships[r].flying){
