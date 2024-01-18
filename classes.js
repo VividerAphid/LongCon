@@ -9,6 +9,7 @@ class player{
         this.hitPower = 100;
         this.isBot = false;
         this.isDead = false;
+        this.pointerOn = true;
     }
     get color(){
         return this.faction.color;

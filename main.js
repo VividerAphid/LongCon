@@ -124,9 +124,18 @@ function render(gameData){
     }
     
     for(let r = 0; r < gameData.ships.length; r++){
+        if(gameData.ships[r].player == gameData.humanPlayer){
+            if(gameData.humanPlayer.pointerOn){
+                gameData.artist.drawPointer(gameData.ships[r].x, gameData.ships[r].y, "#fff");
+                gameData.humanPlayer.pointerOn = false;
+            }
+            else{
+                gameData.humanPlayer.pointerOn = true;
+            }
+        }
         if(gameData.ships[r].faction.id == gameData.humanPlayer.faction.id || checkProximity(gameData.ships[r].at, gameData.map, gameData.humanPlayer.faction.id) || gameData.botWar){  
             gameData.ships[r].draw(gameData.artist);
-            }   
+        }   
     }
 }
 

@@ -64,4 +64,18 @@ class artist{
         }
         g.restore();
     }
+    drawPlanetHighlight(x, y){
+
+    }
+    drawPointer(x, y, color){
+        let scale = 1;
+        this.ctx.fillStyle = color;
+        this.ctx.strokeStyle = color;
+        this.ctx.beginPath();
+        this.ctx.moveTo(x,y); //50,60
+        this.ctx.lineTo(x-12.5, y-25); //37.5, 35
+        this.ctx.bezierCurveTo(x-(scale*25), y-(scale*55), x+(scale*25), y-(scale*55), x+(scale*12.5), y-(scale*25)); //25, 5, 75, 5, 62.5, 35
+        this.ctx.lineTo(x,y); //50,60
+        this.ctx.fill();
+    }
 }
