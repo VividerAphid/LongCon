@@ -136,8 +136,8 @@ function render(gameData){
 }
 
 function uiSetup(gameData){
-    gameboard.width = 3000;
-    gameboard.height = 3000;
+    gameboard.width = gameData.width;
+    gameboard.height = gameData.height;
     gameboard.onclick = function(event){
         event.preventDefault();
         checkHit(gameData);

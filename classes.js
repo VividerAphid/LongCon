@@ -222,5 +222,7 @@ class game{
         this.ships = [];
         this.artist = {};
         this.botWar = false;
+        this.width = "";
+        this.height = "";
     }
 }
