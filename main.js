@@ -85,7 +85,7 @@ function setShipSpawns(gameData){
 
 function loadDefenseAndNeut(map, defenseCap){
     let neutPlayer = new player(0, "neutral");
-    let neutFaction = new faction(0, "neutralF", {color: "#fff", chars: ""});
+    let neutFaction = new faction(0, "neutralF", {color: "#ddd", chars: ""});
     neutPlayer.faction = neutFaction;
     for(let r = 0; r < map.length; r++){
         map[r].defense = Math.floor(Math.random()* defenseCap);
@@ -130,11 +130,7 @@ function render(gameData){
         if(gameData.ships[r].player == gameData.humanPlayer){
             if(gameData.humanPlayer.pointerOn){
                 gameData.artist.drawPointer(gameData.ships[r].x, gameData.ships[r].y, "#fff");
-                //gameData.humanPlayer.pointerOn = false;
             }
-            // else{
-            //     gameData.humanPlayer.pointerOn = true;
-            // }
         } 
     }
 }
