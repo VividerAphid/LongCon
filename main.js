@@ -111,6 +111,12 @@ function render(gameData){
     for(let r = 0; r < gameData.map.length; r++){
         gameData.map[r].drawConnections(gameData.artist, gameData.map);
     }
+
+    for(let r = 0; r < gameData.map.length; r++){
+        if(gameData.map[r].isTargeted){
+            gameData.artist.drawTargetPointer(gameData.map[r].x, gameData.map[r].y, gameData.map[r].radius);
+        }
+    }
     
     for(let r = 0; r < gameData.map.length; r++){
         gameData.map[r].drawStar(gameData.artist);

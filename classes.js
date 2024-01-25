@@ -33,6 +33,7 @@ class star{
         this.owner = {};
         this.connections = cons || [];
         this.constShowing = false;
+        this.isTargeted = false;
         this.radius = 0;
         this.constId = -1;
         this.labelOffsets = {dXOffset: 15, dYOffset: 25, pXOffset: 10, pYOffset: 35};
@@ -182,6 +183,7 @@ class faction{
         this.name = name;
         this.colorSet = colorSet;
         this.players = [];
+        this.targets = [];
     }
     get color(){
         return this.colorSet.color;
