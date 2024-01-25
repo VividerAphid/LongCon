@@ -230,7 +230,7 @@ function checkHit(gameData, isLongpress){
                 if(isLongpress){
                     if(checkProximity(map[r], map, player.faction.id) || map[r].isTargeted){
                         map[r].isTargeted = !map[r].isTargeted;
-                        botTargetUpdate(gameData);
+                        //botTargetUpdate(gameData);
                         render(gameData);
                     }
                 }
