@@ -142,12 +142,9 @@ function render(gameData){
 }
 
 function uiSetup(gameData){
+    inputSetup(gameData);
     gameboard.width = gameData.width;
     gameboard.height = gameData.height;
-    gameboard.onclick = function(event){
-        event.preventDefault();
-        checkHit(gameData);
-    }
 }
 
 function pickSpawns(gameData, spawnCount, perPlayerMin){
@@ -216,8 +213,8 @@ function getAttackValue(map, play){
     return hitValue;
 }
 
-function checkHit(gameData){
-    //console.log("checkhit");
+function checkHit(gameData, isLongpress){
+    console.log("checkhit");
     let canvRect = gameboard.getBoundingClientRect();
 	let x = (event.clientX - canvRect.left);
 	let y = (event.clientY - canvRect.top);
@@ -230,28 +227,37 @@ function checkHit(gameData){
         if(clickRad < 10) clickRad = 10;
 		if (x >= (map[r].x - clickRad) && x <= (map[r].x + clickRad)){
 			if (y >= (map[r].y - clickRad) && y <= (map[r].y + clickRad)){
-                if(map[r] != player.ship.at){
-                    if(map[r].faction.id == player.faction.id){
-                        //console.log("flying!");
-                        player.ship.fly(map[r]);
+                if(isLongpress){
+                    if(checkProximity(map[r], map, player.faction.id) || map[r].isTargeted){
+                        map[r].isTargeted = !map[r].isTargeted;
+                        botTargetUpdate(gameData);
                         render(gameData);
                     }
-                    else{
-                        if(checkProximity(map[r], map, player.faction.id)){
+                }
+                else{
+                    if(map[r] != player.ship.at){
+                        if(map[r].faction.id == player.faction.id){
                             //console.log("flying!");
                             player.ship.fly(map[r]);
                             render(gameData);
                         }
+                        else{
+                            if(checkProximity(map[r], map, player.faction.id)){
+                                //console.log("flying!");
+                                player.ship.fly(map[r]);
+                                render(gameData);
+                            }
+                        }
+                        break;
                     }
-                    break;
-                }
-                else{
-                    if(checkProximity(map[r], map, player.faction.id && player.attacked == false)){
-                        let moveEvent = move(gameData, map[r], player);
-                        botMapUpdate(gameData, moveEvent);
-                        render(gameData);
+                    else{
+                        if(checkProximity(map[r], map, player.faction.id && player.attacked == false)){
+                            let moveEvent = move(gameData, map[r], player);
+                            botMapUpdate(gameData, moveEvent);
+                            render(gameData);
+                        }
                     }
-                }
+                }               
 			}
 		}
 		}
@@ -312,6 +318,16 @@ function botMapUpdate(gameData, moveEvent){
     for(let r = 0; r < players.length; r++){
         if(players[r].isBot){
             players[r].mapUpdate(gameData.map, moveEvent);
+        }
+    }
+}
+
+function botTargetUpdate(gameData){
+    let playerFac = gameData.humanPlayer.faction;
+    let players = playerFac.players;
+    for(let r = 0; r < players.length; r++){
+        if(players[r].isBot){
+            players[r].mapUpdate(gameData.map, {type:"target change"});
         }
     }
 }

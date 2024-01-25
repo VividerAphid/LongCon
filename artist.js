@@ -12,6 +12,7 @@ class artist{
     drawStar(x, y, color, radius){
         //let radius = 10;
         this.ctx.beginPath();
+        this.ctx.lineWidth = 1;
         this.ctx.fillStyle = color;
         this.ctx.strokeStyle = color;
         this.ctx.arc(x, y, (radius*2), 0, 2*Math.PI);
