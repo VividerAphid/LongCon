@@ -13,7 +13,56 @@ class bot extends player{
         console.log("makeMove() not overridden!");
     }
 }
-
+class targetDrone extends bot{
+    constructor(id, name){
+        super(id, name);
+        this.target = "";
+    }
+    onStart(map){
+        //this.findNearestTarget();
+    }
+    mapUpdate(map, moveEvent){
+        if(moveEvent.type == "target"){
+            this.findNearestTarget();
+        }
+    }
+    makeMove(map){
+        if(this.ship.flying){
+            return "fly";
+        }
+        else{
+            return this.ship.at;
+        }
+    }
+    findNearestTarget(){
+        if(this.faction.targets.length > 0){
+            if((this.faction.targets.includes(this.target) && this.ship.flying) || (!this.faction.targets.includes(this.target))){
+                let targs = this.faction.targets;
+                let closest = {x: -100000, y:-100000};
+                let nearby = [];
+                let nearThreshold = 10;
+                for(let r = 0; r < targs.length; r++){
+                    let closestDist = findLengthPoints(this.ship.x, closest.x, this.ship.y, closest.y);
+                    let currTargDist = findLengthPoints(this.ship.x, targs[r].x, this.ship.y, targs[r].y);
+                    if(closestDist > currTargDist){
+                        closest = targs[r];
+                    }
+                    if((currTargDist - closestDist) < nearThreshold){
+                        nearby.push(targs[r]); //Including actual closest is fine for variety
+                    }
+                }
+                if(nearby.length > 0 && findLengthPoints(this.ship.x, this.target.x, this.ship.y, this.target.y) > findLengthPoints(this.ship.x, closest.x, this.ship.y, closest.y)){
+                    let pick = Math.floor(Math.random()*nearby.length);
+                    this.target = nearby[pick];
+                }
+                else{
+                    this.target = closest;
+                }
+                this.ship.fly(this.target); 
+            }    
+        }
+    }
+}
 class basicBot extends bot{
     constructor(id, name){
         super(id, name);

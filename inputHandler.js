@@ -1,6 +1,7 @@
 var inputData = {
     gameDataRef: "",
     mouseDownStart: 0,
+    longpressTime: 500,
 }
 
 function inputSetup(datref){
@@ -16,9 +17,10 @@ function handleMouseDown(){
 }
 
 function handleMouseUp(){
+    event.preventDefault();
     let longpress = false;
-    if(Date.now() - inputData.mouseDownStart > 750){
-        console.log("long press!");
+    if(Date.now() - inputData.mouseDownStart > inputData.longpressTime){
+        //console.log("long press!");
         longpress = true;
     }
     checkHit(inputData.gameDataRef, longpress);
