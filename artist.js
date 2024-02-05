@@ -79,6 +79,10 @@ class artist{
         this.ctx.moveTo(x-(rad+15), y);
         this.ctx.lineTo(x+(rad+15), y);
         this.ctx.stroke();
+
+        this.ctx.fillStyle = "#999";
+        this.ctx.strokeStyle = "#999";
+        this.ctx.lineWidth = 3;
     }
     drawPointer(x, y, color){
         let scale = 1;

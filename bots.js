@@ -40,18 +40,24 @@ class targetDrone extends bot{
                 let targs = this.faction.targets;
                 let closest = {x: -100000, y:-100000};
                 let nearby = [];
-                let nearThreshold = 10;
+                let nearThreshold = 100;
                 for(let r = 0; r < targs.length; r++){
                     let closestDist = findLengthPoints(this.ship.x, closest.x, this.ship.y, closest.y);
                     let currTargDist = findLengthPoints(this.ship.x, targs[r].x, this.ship.y, targs[r].y);
                     if(closestDist > currTargDist){
                         closest = targs[r];
                     }
+                }
+                
+                let closestDist = findLengthPoints(this.ship.x, closest.x, this.ship.y, closest.y);
+                for(let r = 0; r < targs.length; r++){
+                    let currTargDist = findLengthPoints(this.ship.x, targs[r].x, this.ship.y, targs[r].y);
                     if((currTargDist - closestDist) < nearThreshold){
                         nearby.push(targs[r]); //Including actual closest is fine for variety
                     }
                 }
                 if(nearby.length > 0 && findLengthPoints(this.ship.x, this.target.x, this.ship.y, this.target.y) > findLengthPoints(this.ship.x, closest.x, this.ship.y, closest.y)){
+                    console.log(nearby);
                     let pick = Math.floor(Math.random()*nearby.length);
                     this.target = nearby[pick];
                 }
