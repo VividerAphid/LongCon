@@ -2,6 +2,12 @@ var gameData = new game();
 gameData.width = 4060;
 gameData.height = 4060;
 gameData.map = randomGen(gameData.width, gameData.height);
+gameData.consts = genConsts(gameData.map, 5, 7);
+gameData.map = loadDefenseAndNeut(gameData.map, 1500);
+
+//printAllStats(gameData.map, gameData.consts);
+printAvgMapsStats(50, gameData.width, gameData.height, 1500);
+
 gameData.factions = loadTestFactions(1);
 let plaShipPack = loadTestPlayersAndShips(gameData.factions, 5);
 gameData.players = plaShipPack[0];
@@ -13,11 +19,8 @@ gameData.factions[0].players[0] = player1;
 gameData.players[0] = player1;
 gameData.humanPlayer = player1;
 gameData.ships[0].player = player1;
-gameData.map = loadDefenseAndNeut(gameData.map, 1500);
 gameData.map = pickSpawns(gameData, 3, 250);
 setShipSpawns(gameData);
-
-gameData.consts = genConsts(gameData.map, 5, 7);
 
 gameData.botWar = false;
 gameData.debug = false;
