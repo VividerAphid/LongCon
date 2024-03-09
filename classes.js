@@ -185,6 +185,7 @@ class faction{
         this.colorSet = colorSet;
         this.players = [];
         this.targets = [];
+        this.coordinator = "";
     }
     get color(){
         return this.colorSet.color;
@@ -221,6 +222,7 @@ class game{
         this.consts = [];
         this.factions = [];
         this.players = [];
+        this.coordinators = [];
         this.humanPlayer = {};
         this.ships = [];
         this.artist = {};

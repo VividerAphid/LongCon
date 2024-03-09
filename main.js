@@ -53,6 +53,16 @@ function loadTestFactions(count){
     console.log(factions);
     return factions;
 }
+function loadCoordinators(factions){
+    let coordinators = [];
+    for(let r = 0; r < factions.length; r++){
+        let coord = new basicCoordinator(r, "Basic Coordinator");
+        coord.faction = factions[r];
+        factions[r].coordinator = coord;
+        coordinators.push(coord);
+    }
+    return coordinators;
+}
 
 function loadTestPlayersAndShips(factions, perFaction){
     let count = factions.length * perFaction;
@@ -213,13 +223,37 @@ function getAttackValue(map, play){
     return hitValue;
 }
 
-function toggleTarget(faction, target){
+function calcAttackValue(map, play){
+    //For bots to calculate how hard they will hit
+    let defPercent = play.attackStrength;
+    let planPercent = .5;
+    let owned = play.getOwnedIds(map);
+    let sorted = owned.slice();
+    sorted.sort(function(a, b){return map[b].defense - map[a].defense});
+    
+    let count = Math.round(sorted.length * planPercent);
+    let hitValue = 0;
+    for(let r = 0; r < count; r++){
+        if(map[sorted[r]].defense > 0){
+            let scrapeVal = Math.round(map[sorted[r]].defense * defPercent);
+            if(scrapeVal == 0) scrapeVal = 1;
+            hitValue += scrapeVal;
+        }
+        // else{
+        //     r--;
+        // }
+    }
+    return hitValue;
+}
+
+function toggleTarget(map, faction, target){
     if(faction.targets.includes(target)){
         faction.targets = removeItem(faction.targets, target);
     }
     else{
         faction.targets.push(target);
     }
+    botTargetUpdate(gameData, target, faction);
 }
 
 function checkHit(gameData, isLongpress){
@@ -238,8 +272,7 @@ function checkHit(gameData, isLongpress){
 			if (y >= (map[r].y - clickRad) && y <= (map[r].y + clickRad)){
                 if(isLongpress){
                     if(checkProximity(map[r], map, player.faction.id) || player.faction.targets.includes(map[r])){
-                        toggleTarget(player.faction, map[r]);
-                        botTargetUpdate(gameData, map[r], player.faction);
+                        toggleTarget(map, player.faction, map[r]);
                         render(gameData);
                     }
                 }
@@ -315,19 +348,28 @@ function move(gameData, target, player){
 
 function botStart(gameData){
     let players = gameData.players;
+    let coordinators = gameData.coordinators;
+    for(let r = 0; r < coordinators.length; r++){
+        coordinators[r].onStart(gameData.map);
+    }
     for(let r = 0; r < players.length; r++){
         if(players[r].isBot){
             players[r].onStart(gameData.map);
         }
     }
+    
 }
 
 function botMapUpdate(gameData, moveEvent){
     let players = gameData.players;
+    let coordinators = gameData.coordinators;
     for(let r = 0; r < players.length; r++){
         if(players[r].isBot){
             players[r].mapUpdate(gameData.map, moveEvent);
         }
+    }
+    for(let r = 0; r < coordinators.length; r++){
+        coordinators[r].mapUpdate(gameData.map, moveEvent);
     }
 }
 
