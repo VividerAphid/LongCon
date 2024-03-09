@@ -223,6 +223,7 @@ class basicCoordinator extends coordinator{
         }
         for(let r = 0; r < i; r++){
             toggleTarget(map, this.faction, map[options[r][0]]);
+            this.faction.targets.push(map[options[r][0]]);
         }
         //console.log("From " + this.id);
         //console.log(this.faction.targets);
@@ -230,11 +231,24 @@ class basicCoordinator extends coordinator{
     mapUpdate(map, event){
         if(event.type == "capture" && event.attacker.faction == this.faction){
             toggleTarget(map, this.faction, event.target);
+            this.faction.targets = removeItem(this.faction.targets, event.target);
             let cons = event.target.connections;
             for(let t in cons){
                 let attVal = calcAttackValue(map, this.faction.players[0]);
-                if(map[cons[t]].defense / attVal < 4 && map[cons[t]].faction.id != this.faction.id){
+                if(map[cons[t]].defense / attVal < 4 && map[cons[t]].faction.id != this.faction.id && !this.faction.targets.includes(map[cons[t]])){
                     toggleTarget(map, this.faction, map[cons[t]]);
+                    this.faction.targets.push(map[cons[t]]);
+                }
+            }
+        }
+        else if(event.type == "capture" && event.attacker.faction != this.faction){
+            let cons = event.target.connections;
+            for(let t in cons){
+                if(this.faction.targets.includes(map[cons[t]])){
+                    if(checkProximity(map[cons[t]], map, this.faction.id) == false){
+                        toggleTarget(map, this.faction, map[cons[t]]);
+                        this.faction.targets = removeItem(this.faction.targets, map[cons[t]]);
+                    }
                 }
             }
         }
