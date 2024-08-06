@@ -195,7 +195,6 @@ class coordinator extends bot{
 class basicCoordinator extends coordinator{
     constructor(id, name){
         super(id, name);
-        this.budget = 0;
     }
     onStart(map){
         let spawns = this.getOwned(map);
@@ -217,7 +216,9 @@ class basicCoordinator extends coordinator{
         options.sort(function(a, b){return a[1] - b[1]});
         let cost = 0;
         let i = 0;
-        while(cost < defense){
+        //console.log(options.length);
+        while(cost < defense && i < options.length){
+            //console.log(i);
             cost += map[options[i][0]].defense;
             i++;
         }
@@ -252,16 +253,5 @@ class basicCoordinator extends coordinator{
                 }
             }
         }
-    }
-    loadBudget(map){
-        let budget = 0;
-        for(let r = 0; r < spawns.length; r++){
-            defense += spawns[r].defense;
-            let cons = spawns[r].connections;
-            for(let t in cons){
-                options.push(cons[t]);
-            }
-        }
-        return budget;
     }
 }
