@@ -33,10 +33,10 @@ gameData.artist = new artist(gameboard.getContext("2d"));
 uiSetup(gameData);
 render(gameData);
 
-var defenseIntTime = 10000;//60000;//3600000;
-var flightIntTime = 100;//1000;
-var attackIntTime = 100;//1000;
-var botIntTime = 1000;//5000;
+var defenseIntTime = 60000;//3600000;
+var flightIntTime = 1000;
+var attackIntTime = 1000;
+var botIntTime = 5000;
 var defenseUpdater = "";
 var flightUpdater = "";
 var attackUpdater = "";
