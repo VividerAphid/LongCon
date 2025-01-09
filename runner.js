@@ -9,7 +9,7 @@ gameData.map = loadDefenseAndNeut(gameData.map, 1500);
 //printAvgMapsStats(50, gameData.width, gameData.height, 1500);
 
 gameData.factions = loadTestFactions(10);
-let plaShipPack = loadTestPlayersAndShips(gameData.factions, 50);
+let plaShipPack = loadTestPlayersAndShips(gameData.factions, 15);
 gameData.players = plaShipPack[0];
 gameData.ships = plaShipPack[1];
 var player1 = new player(1, "Player");
@@ -21,7 +21,7 @@ gameData.ships[0] = player1Ship;
 gameData.humanPlayer = player1;
 gameData.humanPlayer.ship = player1Ship;
 gameData.ships[0].player = player1;
-gameData.map = pickSpawns(gameData, 1, 5000);
+gameData.map = pickSpawns(gameData, Math.floor(Math.random()*50)+1, 250);
 gameData.coordinators = loadCoordinators(gameData.factions);
 setShipSpawns(gameData);
 
