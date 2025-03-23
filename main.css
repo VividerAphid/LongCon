@@ -3,3 +3,7 @@ body {
 	background-color:#222;
 	font-size:20px;
 }
+
+.factionRGBEntry{
+	display:inline;
+}

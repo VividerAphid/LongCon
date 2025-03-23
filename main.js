@@ -53,6 +53,7 @@ function loadTestFactions(count){
     console.log(factions);
     return factions;
 }
+
 function loadCoordinators(factions){
     let coordinators = [];
     for(let r = 0; r < factions.length; r++){
@@ -418,4 +419,8 @@ function flightUpdate(gameData){
         }
     }
     render(gameData);
+}
+
+function startTimers(){
+    
 }

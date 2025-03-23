@@ -1,7 +1,7 @@
 var gameData = new game();
 gameData.width = 3500;//4060;
 gameData.height = 3500;//4060;
-gameData.map = randomGen(gameData.width, gameData.height);
+gameData.map = convertMap(galconSnowflake1());//randomGen(gameData.width, gameData.height);
 gameData.consts = genConsts(gameData.map, 9, 12);
 gameData.map = loadDefenseAndNeut(gameData.map, 1500);
 
