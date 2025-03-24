@@ -17,7 +17,54 @@
 <script src="main.js"></script>
 <script src="stats.js"></script>
 
+<script src="ui.js"></script>
+
 <body>
+    <div id="menuDiv">
+        <label for="mapdrp">Map: </label>
+        <select id="mapdrp" onchange="updateMap()">
+            <option>Random Gen</option>
+            <option>Galcon Galaxy 7</option>
+            <option>Galcon Galaxy 8</option>
+            <option>Galcon Snowflake 1</option>
+            <option>Galcon Snowflake 2</option>       
+        </select>
+        <br>
+        <label for="factionCountdrp">Number of Factions: </label>
+        <select id="factionCountdrp" onchange="toggleFactionCountSelect()">
+            <option>Random Count</option>
+            <option>Select Count</option>            
+        </select>
+        <input id="factionCountinp" value=10 min=1 max=25 type="number" style="display: none" onchange="factionCountChange()">
+        <br>
+        <label for="playerCountdrp">Players Per Faction: </label>
+        <select id="playerCountdrp" onchange="togglePlayerCountSelect()">
+            <option>Random Count</option>
+            <option>Select Count</option>            
+        </select>
+        <input id="playerCountinp" value=10 min=1 max=25 type="number" style="display: none" onchange="playerCountChange()">(Total Allowed 250)
+        <br>
+        <label for="factionListing">Factions:</label>
+        <div id="factionListing">
+        </div>
+        <label for="spectatechx">Spectate Mode: </label>
+        <input id="spectatechx" type="checkbox" onchange="toggleCoordinatorChxDisabled()">
+        <br>
+        <label for="coordinatorChx">Coordinator bot: </label>
+        <input id="coordinatorChx" type="checkbox" checked="true">
+        <br>
+        <button id="startBtn" onclick="startBtnClick()">Start</button>
+    </div>
+    <script>
+        var maxAllowedPlayers = 250;
+        var factions = [];
+        var map = [];
+        updateMap();
+        initFactions();
+        initFactionListings();
+        toggleFactionCountSelect();
+        togglePlayerCountSelect();
+    </script>
     <canvas id="gameboard"></canvas>
-    <script src="runner.js"></script>
+    <!-- <script src="runner.js"></script> -->
 </body>

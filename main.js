@@ -54,6 +54,20 @@ function loadTestFactions(count){
     return factions;
 }
 
+function loadFactions(facs){
+    let factions = [];
+    let charSet = ['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l', 'm', 'n', 'o', 'p', 'q', 'r', 's', 't', 'u', 'v',
+        'w', 'x', 'y', 'z', '1', '2', '3', '4', '5', '6', '7', '8', '9', '0'];
+    for(let r = 0; r < facs.length; r++){
+        let charPicks = [Math.floor(Math.random()*charSet.length), Math.floor(Math.random()*charSet.length)];
+        let chars = charSet[charPicks[0]] + charSet[charPicks[1]];
+        let colors = facs[r].colors;
+        factions.push(new faction(r+1, "Fac"+r+1, {color: colors[0], chars: chars, inverse: colors[1]}));
+        factions[r].players = [];
+    }
+    return factions;
+}
+
 function loadCoordinators(factions){
     let coordinators = [];
     for(let r = 0; r < factions.length; r++){
@@ -124,9 +138,11 @@ function render(gameData){
         gameData.map[r].drawConnections(gameData.artist, gameData.map);
     }
 
-    let targeted = gameData.humanPlayer.faction.targets;
-    for(let r = 0; r < targeted.length; r++){
-        gameData.artist.drawTargetPointer(targeted[r].x, targeted[r].y, targeted[r].radius);
+    if(!gameData.spectateMode){
+        let targeted = gameData.humanPlayer.faction.targets;
+        for(let r = 0; r < targeted.length; r++){
+            gameData.artist.drawTargetPointer(targeted[r].x, targeted[r].y, targeted[r].radius);
+        }
     }
     
     for(let r = 0; r < gameData.map.length; r++){
@@ -140,16 +156,21 @@ function render(gameData){
         }
     }
     
-    for(let r = 0; r < gameData.ships.length; r++){
-        if(gameData.ships[r].faction.id == gameData.humanPlayer.faction.id || checkProximity(gameData.ships[r].at, gameData.map, gameData.humanPlayer.faction.id) || gameData.botWar){  
-            gameData.ships[r].draw(gameData.artist);
-        }  
-        if(gameData.ships[r].player == gameData.humanPlayer){
-            if(gameData.humanPlayer.pointerOn){
-                gameData.artist.drawPointer(gameData.ships[r].x, gameData.ships[r].y, "#fff");
+        for(let r = 0; r < gameData.ships.length; r++){
+            if(gameData.spectateMode){
+                gameData.ships[r].draw(gameData.artist);
             }
-        } 
-    }
+            else{
+                if(gameData.ships[r].faction.id == gameData.humanPlayer.faction.id || checkProximity(gameData.ships[r].at, gameData.map, gameData.humanPlayer.faction.id)){  
+                    gameData.ships[r].draw(gameData.artist);
+                }  
+                if(gameData.ships[r].player == gameData.humanPlayer){
+                    if(gameData.humanPlayer.pointerOn){
+                        gameData.artist.drawPointer(gameData.ships[r].x, gameData.ships[r].y, "#fff");
+                    }
+                }
+            }
+        }
 }
 
 function uiSetup(gameData){
@@ -259,51 +280,53 @@ function toggleTarget(map, faction, target){
 
 function checkHit(gameData, isLongpress){
     //console.log("checkhit");
-    let canvRect = gameboard.getBoundingClientRect();
-	let x = (event.clientX - canvRect.left);
-	let y = (event.clientY - canvRect.top);
-    let r;
-    let map = gameData.map;
-    let player = gameData.humanPlayer;
-    let reps = map.length;
-		for(r=0; r<reps;r++){
-        let clickRad = map[r].radius*2;
-        if(clickRad < 10) clickRad = 10;
-		if (x >= (map[r].x - clickRad) && x <= (map[r].x + clickRad)){
-			if (y >= (map[r].y - clickRad) && y <= (map[r].y + clickRad)){
-                if(isLongpress){
-                    if(checkProximity(map[r], map, player.faction.id) || player.faction.targets.includes(map[r])){
-                        toggleTarget(map, player.faction, map[r]);
-                        render(gameData);
-                    }
-                }
-                else{
-                    if(map[r] != player.ship.at){
-                        if(map[r].faction.id == player.faction.id){
-                            //console.log("flying!");
-                            player.ship.fly(map[r]);
+    if(!gameData.spectateMode){
+        let canvRect = gameboard.getBoundingClientRect();
+        let x = (event.clientX - canvRect.left);
+        let y = (event.clientY - canvRect.top);
+        let r;
+        let map = gameData.map;
+        let player = gameData.humanPlayer;
+        let reps = map.length;
+            for(r=0; r<reps;r++){
+            let clickRad = map[r].radius*2;
+            if(clickRad < 10) clickRad = 10;
+            if (x >= (map[r].x - clickRad) && x <= (map[r].x + clickRad)){
+                if (y >= (map[r].y - clickRad) && y <= (map[r].y + clickRad)){
+                    if(isLongpress){
+                        if(checkProximity(map[r], map, player.faction.id) || player.faction.targets.includes(map[r])){
+                            toggleTarget(map, player.faction, map[r]);
                             render(gameData);
                         }
-                        else{
-                            if(checkProximity(map[r], map, player.faction.id)){
+                    }
+                    else{
+                        if(map[r] != player.ship.at){
+                            if(map[r].faction.id == player.faction.id){
                                 //console.log("flying!");
                                 player.ship.fly(map[r]);
                                 render(gameData);
                             }
+                            else{
+                                if(checkProximity(map[r], map, player.faction.id)){
+                                    //console.log("flying!");
+                                    player.ship.fly(map[r]);
+                                    render(gameData);
+                                }
+                            }
+                            break;
                         }
-                        break;
-                    }
-                    else{
-                        if(checkProximity(map[r], map, player.faction.id && player.attacked == false)){
-                            let moveEvent = move(gameData, map[r], player);
-                            botMapUpdate(gameData, moveEvent);
-                            render(gameData);
+                        else{
+                            if(checkProximity(map[r], map, player.faction.id && player.attacked == false)){
+                                let moveEvent = move(gameData, map[r], player);
+                                botMapUpdate(gameData, moveEvent);
+                                render(gameData);
+                            }
                         }
-                    }
-                }               
-			}
-		}
-		}
+                    }               
+                }
+            }
+            }
+    }
 }
 
 function checkProximity(targ, map, id){

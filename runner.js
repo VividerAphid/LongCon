@@ -1,26 +1,29 @@
 var gameData = new game();
 gameData.width = 3500;//4060;
 gameData.height = 3500;//4060;
-gameData.map = convertMap(galconSnowflake2());//randomGen(gameData.width, gameData.height);
-gameData.consts = genConsts(gameData.map, 9, 12);
+gameData.map = map;//convertMap(galconSnowflake2());//randomGen(gameData.width, gameData.height);
+gameData.consts = genConsts(gameData.map, 5, 7);
 gameData.map = loadDefenseAndNeut(gameData.map, 1500);
+gameData.spectateMode = spectatechx.checked;
 
 //printAllStats(gameData.map, gameData.consts);
 //printAvgMapsStats(50, gameData.width, gameData.height, 1500);
 
-gameData.factions = loadTestFactions(25);
-let plaShipPack = loadTestPlayersAndShips(gameData.factions, 10);
+gameData.factions = loadFactions(factions);
+let plaShipPack = loadTestPlayersAndShips(gameData.factions, playerCountinp.value);
 gameData.players = plaShipPack[0];
 gameData.ships = plaShipPack[1];
-var player1 = new player(1, "Player");
-var player1Ship = new ship(1, player1);
-player1.faction = gameData.factions[0];
-gameData.factions[0].players[0] = player1;
-gameData.players[0] = player1;
-gameData.ships[0] = player1Ship;
-gameData.humanPlayer = player1;
-gameData.humanPlayer.ship = player1Ship;
-gameData.ships[0].player = player1;
+if(gameData.spectateMode == false){
+    var player1 = new player(1, "Player");
+    var player1Ship = new ship(1, player1);
+    player1.faction = gameData.factions[0];
+    gameData.factions[0].players[0] = player1;
+    gameData.players[0] = player1;
+    gameData.ships[0] = player1Ship;
+    gameData.humanPlayer = player1;
+    gameData.humanPlayer.ship = player1Ship;
+    gameData.ships[0].player = player1;
+}
 gameData.map = pickSpawns(gameData, Math.floor(Math.random()*50)+1, 250);
 gameData.coordinators = loadCoordinators(gameData.factions);
 setShipSpawns(gameData);

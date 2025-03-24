@@ -218,6 +218,7 @@ class faction{
 
 class game{
     constructor(){
+        this.spectateMode = false;
         this.map = [];
         this.consts = [];
         this.factions = [];

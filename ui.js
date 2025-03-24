@@ -119,3 +119,39 @@ function updateFactionColor(id, colors){
     ];
     factions[id].colors = newCols;
 }
+
+function updateMap(){
+    switch(mapdrp.selectedIndex){
+        case 0:
+            map = randomGen(3500,3500);
+            break;
+        case 1:
+            map = convertMap(galconGalaxy7());
+            break;
+        case 2:
+            map = convertMap(galconGalaxy8());
+            break;
+        case 3:
+            map = convertMap(galconSnowflake1());
+            break;
+        case 3:
+            map = convertMap(galconSnowflake2());
+            break;
+    }
+}
+
+function startBtnClick(){
+    if(factionCountdrp.selectedIndex == 0){
+        factionCountinp.value = Math.floor(Math.random()*23)+ 2;
+        initFactions();
+    }
+    if(playerCountdrp.selectedIndex == 0){
+        let max = maxAllowedPlayers / factionCountinp.value;
+        playerCountinp.value = Math.floor(Math.random()*max)+ 1;
+    }
+    factions = factions.slice(0, factionCountinp.value);
+    console.log(factions);
+    addElement("runnerScr", "script", document.body);
+    runnerScr.setAttribute('src', "runner.js");
+    menuDiv.style.display = "none";
+}

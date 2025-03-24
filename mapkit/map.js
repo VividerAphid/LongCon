@@ -188,7 +188,6 @@ function genConsts(map, minSize, maxSize){
 }
 
 function convertMap(coordData){
-    console.log(coordData[0]);
     let map = [];
     let count = coordData.length;
     for(let r = 0; r < count; r++){
