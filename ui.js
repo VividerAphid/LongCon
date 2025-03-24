@@ -33,12 +33,27 @@ function toggleCoordinatorChxDisabled(){
 }
 
 function factionCountChange(){
+    if((factionCountinp.value * 1) > (factionCountinp.max * 1)){
+        factionCountinp.value = factionCountinp.max;
+    }
+    if((factionCountinp.value * 1) < (factionCountinp.min * 1)){
+        factionCountinp.value = factionCountinp.min;
+    }
     playerCountinp.max = Math.round(250 / factionCountinp.value);
     if((playerCountinp.value * 1) > (playerCountinp.max * 1)){
         playerCountinp.value = playerCountinp.max;
     }
     initFactions();
     initFactionListings();
+}
+
+function playerCountChange(){
+    if((playerCountinp.value * 1) > (playerCountinp.max * 1)){
+        playerCountinp.value = playerCountinp.max;
+    }
+    if((playerCountinp.value * 1) < (playerCountinp.min * 1)){
+        playerCountinp.value = playerCountinp.min;
+    }
 }
 
 function initFactionListings(){
