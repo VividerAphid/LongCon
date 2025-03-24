@@ -15,26 +15,32 @@
             <option>Random Count</option>
             <option>Select Count</option>            
         </select>
-        <input id="factionCountinp" value=10 min=1 max=25 type="number" style="display: none">
+        <input id="factionCountinp" value=10 min=1 max=25 type="number" style="display: none" onchange="factionCountChange()">
         <br>
         <label for="playerCountdrp">Players Per Faction: </label>
         <select id="playerCountdrp" onchange="togglePlayerCountSelect()">
             <option>Random Count</option>
             <option>Select Count</option>            
         </select>
-        <input id="playerCountinp" value=10 min=1 max=25 type="number" style="display: none">
+        <input id="playerCountinp" value=10 min=1 max=25 type="number" style="display: none">(Total Allowed 250)
         <br>
         <label for="factionListing">Factions:</label>
         <div id="factionListing">
         </div>
         <label for="spectatechx">Spectate Mode: </label>
-        <input id="spectatechx" type="checkbox">
+        <input id="spectatechx" type="checkbox" onchange="toggleCoordinatorChxDisabled()">
+        <br>
+        <label for="coordinatorChx">Coordinator bot: </label>
+        <input id="coordinatorChx" type="checkbox" checked="true">
         <br>
         <button id="startBtn">Start</button>
     </div>
     <script>
+        var maxAllowedPlayers = 250;
         var factions = [];
         initFactions();
         initFactionListings();
+        toggleFactionCountSelect();
+        togglePlayerCountSelect();
     </script>
 </body>

@@ -25,6 +25,22 @@ function togglePlayerCountSelect(){
     }
 }
 
+function toggleCoordinatorChxDisabled(){
+    coordinatorChx.disabled = !coordinatorChx.disabled;
+    if(coordinatorChx){
+        coordinatorChx.checked = true;
+    }
+}
+
+function factionCountChange(){
+    playerCountinp.max = Math.round(250 / factionCountinp.value);
+    if((playerCountinp.value * 1) > (playerCountinp.max * 1)){
+        playerCountinp.value = playerCountinp.max;
+    }
+    initFactions();
+    initFactionListings();
+}
+
 function initFactionListings(){
     factionListing.innerHTML = "";
     let count = 0;
@@ -49,16 +65,16 @@ function initFactionListings(){
         rInp.min = 0;
         rInp.max = 255;
         let gDiv = addElement("gDiv"+r, "div", rgbDiv, "G: ");
-        let gInp = addElement("rInp"+r, "input", gDiv);
+        let gInp = addElement("gInp"+r, "input", gDiv);
         gInp.value = colors[2][1];
         gInp.onchange = function(){colors[2][1] = gInp.value; updateFactionColor(r, colors); initFactionListings();};
         gInp.size = inpSize;
         gInp.min = 0;
         gInp.max = 255;
         let bDiv = addElement("bDiv"+r, "div", rgbDiv, "B: ");
-        let bInp = addElement("rInp"+r, "input", bDiv);
+        let bInp = addElement("bInp"+r, "input", bDiv);
         bInp.value = colors[2][2];
-        bInp.onchange = function(){colors[2][2] = bInp.value; updateFactionColor(r, colors); initFactionListings;};
+        bInp.onchange = function(){colors[2][2] = bInp.value; updateFactionColor(r, colors); initFactionListings();};
         bInp.size = inpSize;
         bInp.min = 0;
         bInp.max = 255;
@@ -67,7 +83,7 @@ function initFactionListings(){
         gDiv.className = "factionRGBEntry";
         bDiv.className = "factionRGBEntry";
         rgbDiv.style.display = "inline";
-        el.style.width = "15%";
+        el.style.width = "25%";
     }
 }
 

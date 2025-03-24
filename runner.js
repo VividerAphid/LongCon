@@ -1,15 +1,15 @@
 var gameData = new game();
 gameData.width = 3500;//4060;
 gameData.height = 3500;//4060;
-gameData.map = convertMap(galconSnowflake1());//randomGen(gameData.width, gameData.height);
+gameData.map = convertMap(galconSnowflake2());//randomGen(gameData.width, gameData.height);
 gameData.consts = genConsts(gameData.map, 9, 12);
 gameData.map = loadDefenseAndNeut(gameData.map, 1500);
 
 //printAllStats(gameData.map, gameData.consts);
 //printAvgMapsStats(50, gameData.width, gameData.height, 1500);
 
-gameData.factions = loadTestFactions(10);
-let plaShipPack = loadTestPlayersAndShips(gameData.factions, 15);
+gameData.factions = loadTestFactions(25);
+let plaShipPack = loadTestPlayersAndShips(gameData.factions, 10);
 gameData.players = plaShipPack[0];
 gameData.ships = plaShipPack[1];
 var player1 = new player(1, "Player");
