@@ -31,7 +31,7 @@ class star{
         this.prod = prod;
         this.defense = 0;
         this.owner = {};
-        this.connections = cons || [];
+        this.connections = cons || []; //list of integers
         this.constShowing = false;
         this.radius = 0;
         this.constId = -1;
@@ -227,8 +227,8 @@ class game{
         this.humanPlayer = {};
         this.ships = [];
         this.artist = {};
-        this.botWar = false;
         this.width = "";
         this.height = "";
+        this.neutCostCap = 0;
     }
 }

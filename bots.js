@@ -185,10 +185,30 @@ class coordinator extends bot{
         this.isCoordinator = true;
     }
     onStart(map){
-        console.log("mapUpdate() not overridden!");
+        console.log("onStart() not overridden!");
     }
     mapUpdate(map){
-        console.log("makeMove() not overridden!");
+        console.log("mapUpdate() not overridden!");
+    }
+    addTarget(map, targetStar){
+        //targetStar actual star reference, NOT ID
+        toggleTarget(map, this.faction, targetStar);
+        this.faction.targets.push(targetStar);
+    }
+    removeTarget(map, targetStar){
+        //targetStar actual star reference, NOT ID
+        toggleTarget(map, this.faction, targetStar);
+        this.faction.targets = removeItem(this.faction.targets, targetStar);
+    }
+}
+class dummyCoordinator extends coordinator{
+    constructor(id, name){
+        super(id, name);
+        this.isCoordinator = true;
+    }
+    onStart(map){
+    }
+    mapUpdate(map){
     }
 }
 
@@ -223,8 +243,7 @@ class basicCoordinator extends coordinator{
             i++;
         }
         for(let r = 0; r < i; r++){
-            toggleTarget(map, this.faction, map[options[r][0]]);
-            this.faction.targets.push(map[options[r][0]]);
+            this.addTarget(map, map[options[r][0]]);
         }
         //console.log("From " + this.id);
         //console.log(this.faction.targets);
@@ -237,8 +256,7 @@ class basicCoordinator extends coordinator{
             for(let t in cons){
                 let attVal = calcAttackValue(map, this.faction.players[0]);
                 if(map[cons[t]].defense / attVal < 4 && map[cons[t]].faction.id != this.faction.id && !this.faction.targets.includes(map[cons[t]])){
-                    toggleTarget(map, this.faction, map[cons[t]]);
-                    this.faction.targets.push(map[cons[t]]);
+                    this.addTarget(map, map[cons[t]]);
                 }
             }
         }
@@ -247,11 +265,86 @@ class basicCoordinator extends coordinator{
             for(let t in cons){
                 if(this.faction.targets.includes(map[cons[t]])){
                     if(checkProximity(map[cons[t]], map, this.faction.id) == false){
-                        toggleTarget(map, this.faction, map[cons[t]]);
-                        this.faction.targets = removeItem(this.faction.targets, map[cons[t]]);
+                        this.removeTarget(map, map[cons[t]]);
                     }
                 }
             }
         }
+    }
+}
+
+class coordinatorCheapGrab extends coordinator{
+    //grab cheap stars in proximity, then pick a single cluster that is biggest after some time
+    //prefer a floodfill style expansion, retaking cluster stars
+    constructor(id, name){
+        super(id, name);
+        this.cluster = [];
+        this.prodCycles = 0;
+        this.desired = [];
+        this.extra = {};
+        this.grabbingCheaps = true;
+        this.grabCheapsEnd = 10;
+        this.cheapsThreshold = .5;
+    }
+    onStart(map, extra){
+        let owned = this.getOwned(map);
+        this.extra = extra;
+        while(this.desired.length == 0){
+            for(let r = 0; r < owned.length; r++){
+                this.selectConnectedCheaps(map, owned[r]);
+            }
+            this.cheapsThreshold += .1; //increase in case we don't find any somehow
+        }
+        this.cheapsThreshold = .5; //reset after we are done looking
+    }
+    mapUpdate(map, event){
+        if(event.type == "production"){
+            this.prodCycles++;
+            if(this.prodCycles == this.grabCheapsEnd){
+                this.grabbingCheaps = false;
+            }
+        }
+        if(event.type == "capture"){
+            if(event.attacker.faction.id == this.faction.id){
+                if(this.desired.includes(event.target)){
+                    this.desired = removeItem(this.desired, event.target);
+                    this.removeTarget(map, event.target);
+                }
+                if(this.grabbingCheaps){
+                    this.selectConnectedCheaps(map, event.target);
+                }
+            }
+            else{
+               //check if proximity was lost to a target
+                
+            }
+        }
+        
+    }
+    selectConnectedCheaps(map, target){ 
+        let cons = target.connections;
+        for(let r = 0; r < cons.length; r++){
+            let connection = map[cons[r]];
+            if(connection.defense < this.extra.neutCostCap * this.cheapsThreshold && connection.owner.faction.id != this.faction.id){
+                this.desired.push(connection);
+                this.addTarget(map, connection);
+            }
+        }
+    }
+
+}
+
+class clusterRushCoordinator extends bot{
+    //Pick a single cluster immediately and expand from that
+    //prefer a floodfill style expansion, retaking cluster stars
+    constructor(id, name){
+        super(id, name);
+        this.isCoordinator = true;
+    }
+    onStart(map){
+        console.log("onStart() not overridden!");
+    }
+    mapUpdate(map){
+        console.log("mapUpdate() not overridden!");
     }
 }

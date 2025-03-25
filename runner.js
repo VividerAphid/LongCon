@@ -1,9 +1,10 @@
 var gameData = new game();
 gameData.width = 3500;//4060;
 gameData.height = 3500;//4060;
+gameData.neutCostCap = 1500;
 gameData.map = map;//convertMap(galconSnowflake2());//randomGen(gameData.width, gameData.height);
 gameData.consts = genConsts(gameData.map, 5, 7);
-gameData.map = loadDefenseAndNeut(gameData.map, 1500);
+gameData.map = loadDefenseAndNeut(gameData.map, gameData.neutCostCap);
 gameData.spectateMode = spectatechx.checked;
 
 //printAllStats(gameData.map, gameData.consts);
@@ -36,10 +37,10 @@ gameData.artist = new artist(gameboard.getContext("2d"));
 uiSetup(gameData);
 render(gameData);
 
-var defenseIntTime = 60000;//3600000;
-var flightIntTime = 1000;
-var attackIntTime = 1000;
-var botIntTime = 5000;
+var defenseIntTime = 10000;//60000;//3600000;
+var flightIntTime = 100;
+var attackIntTime = 100;
+var botIntTime = 1000;
 var defenseUpdater = "";
 var flightUpdater = "";
 var attackUpdater = "";

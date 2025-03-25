@@ -71,10 +71,19 @@ function loadFactions(facs){
 function loadCoordinators(factions){
     let coordinators = [];
     for(let r = 0; r < factions.length; r++){
-        let coord = new basicCoordinator(r, "Basic Coordinator");
-        coord.faction = factions[r];
-        factions[r].coordinator = coord;
-        coordinators.push(coord);
+        if(r == 0 && coordinatorChx.checked == false){
+            let coord = new dummyCoordinator(r, "Placeholder Coordinator");
+            coord.faction = factions[r];
+            factions[r].coordinator = coord;
+            coordinators.push(coord);
+        }
+        else{
+            let coord = new basicCoordinator(r, "Basic Coordinator");
+            coord.faction = factions[r];
+            factions[r].coordinator = coord;
+            coordinators.push(coord);
+        }
+        
     }
     return coordinators;
 }
@@ -373,18 +382,21 @@ function move(gameData, target, player){
 function botStart(gameData){
     let players = gameData.players;
     let coordinators = gameData.coordinators;
+    let extraData = {neutCostCap: gameData.neutCostCap, factions: gameData.factions};
     for(let r = 0; r < coordinators.length; r++){
-        coordinators[r].onStart(gameData.map);
+        coordinators[r].onStart(gameData.map, extraData);
     }
     for(let r = 0; r < players.length; r++){
         if(players[r].isBot){
-            players[r].onStart(gameData.map);
+            players[r].onStart(gameData.map, extraData);
         }
     }
     
 }
 
 function botMapUpdate(gameData, moveEvent){
+    //event types:
+    //"capture", "attack", "defense", "production"
     let players = gameData.players;
     let coordinators = gameData.coordinators;
     for(let r = 0; r < players.length; r++){
@@ -424,6 +436,7 @@ function botMove(gameData){
 
 function hourRefresh(gameData){
     addDefense(gameData.map);
+    botMapUpdate(gameData, {type:"production"});
     render(gameData);
 }
 

@@ -134,7 +134,7 @@ function updateMap(){
         case 3:
             map = convertMap(galconSnowflake1());
             break;
-        case 3:
+        case 4:
             map = convertMap(galconSnowflake2());
             break;
     }
