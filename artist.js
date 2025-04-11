@@ -1,8 +1,18 @@
 class artist{
     constructor(ctx){
         this.ctx = ctx;
-        this.scale = 1;
         this.labelFont = "bold 15px Consolas";
+        this.cameraOffset = {x: this.ctx.canvas.width/2, y: this.ctx.canvas.height/2};
+        this.cameraZoom = 1;
+        this.maxZoom = 3;
+        this.minZoom = 0.1;
+        this.initialPinchDistance = null;
+        this.lastZoom = this.cameraZoom;
+        this.scrollSensitivity = 0.0005;
+        this.isDragging = false;
+        this.dragChanged = false;
+        this.dragStart = {x: 0, y: 0};
+        this.mouseDownStart = {x: 0, y:0};
     }
     fillRect(x, y, w, h, fill, stroke){
         this.ctx.fillStyle = fill;
@@ -25,12 +35,13 @@ class artist{
         this.ctx.font = font;
         this.ctx.fillText(text, x, y);
     }
-    drawTriangle(triangle){
+    drawTriangle(triangle, triangleScale=1){
+        //let triangleScale = 1;
         let g = this.ctx;
         let baseWidth = 10;
         let height = 14;
-        let scaledX = triangle.x * this.scale;
-        let scaledY = triangle.y * this.scale;
+        let scaledX = triangle.x * triangleScale;
+        let scaledY = triangle.y * triangleScale;
         g.save();
         g.lineWidth = 1;
         g.strokeStyle = triangle.color;
@@ -40,9 +51,9 @@ class artist{
         g.translate(-scaledX, -scaledY);
         g.beginPath();
 
-        g.moveTo(scaledX-(baseWidth*this.scale), scaledY-(height*this.scale));
-        g.lineTo(scaledX+(baseWidth*this.scale), scaledY-(height*this.scale));
-        g.lineTo(scaledX, scaledY+(height*this.scale));
+        g.moveTo(scaledX-(baseWidth*triangleScale), scaledY-(height*triangleScale));
+        g.lineTo(scaledX+(baseWidth*triangleScale), scaledY-(height*triangleScale));
+        g.lineTo(scaledX, scaledY+(height*triangleScale));
 
         g.closePath();
         g.fill();
@@ -56,9 +67,9 @@ class artist{
             g.translate(-scaledX, -scaledY);
             g.beginPath();
 
-            g.moveTo(scaledX-(baseWidth*this.scale), scaledY-(height*this.scale));
-            g.lineTo(scaledX+(baseWidth*this.scale), scaledY-(height*this.scale));
-            g.lineTo(scaledX, scaledY+(height*this.scale));
+            g.moveTo(scaledX-(baseWidth*triangleScale), scaledY-(height*triangleScale));
+            g.lineTo(scaledX+(baseWidth*triangleScale), scaledY-(height*triangleScale));
+            g.lineTo(scaledX, scaledY+(height*triangleScale));
 
             g.closePath();
             g.stroke();

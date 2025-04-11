@@ -25,7 +25,7 @@ if(gameData.spectateMode == false){
     gameData.humanPlayer.ship = player1Ship;
     gameData.ships[0].player = player1;
 }
-gameData.map = pickSpawns(gameData, Math.floor(Math.random()*50)+1, 250);
+gameData.map = pickSpawns(gameData, Math.floor(Math.random()*50)+1, 0);
 gameData.coordinators = loadCoordinators(gameData.factions);
 setShipSpawns(gameData);
 
@@ -34,7 +34,8 @@ gameData.debug = false;
 botStart(gameData);
 
 gameData.artist = new artist(gameboard.getContext("2d"));
-uiSetup(gameData);
+//uiSetup(gameData);
+initListeners(gameData);
 render(gameData);
 
 var defenseIntTime = 10000;//60000;//3600000;

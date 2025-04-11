@@ -205,6 +205,27 @@ class faction{
         }
         return owned;
     }
+    getScore(map){
+        //Return score / prod value
+        let owned = this.getOwned(map);
+        let score = 0;
+        for(let r in owned){
+            score += owned[r].prod;
+            if(owned[r].constShowing){
+                score += owned[r].prod;
+            }
+        }
+        return score;
+    }
+    getTotalDefense(map){
+        //Return total defense across all owned stars
+        let owned = this.getOwned(map);
+        let defense = 0;
+        for(let r in owned){
+            defense += owned[r].defense;
+        }
+        return defense;
+    }
     getOwnedIds(map){
         let owned = [];
         for(let r = 0; r < map.length; r++){

@@ -4,12 +4,20 @@
 </head>
 
 <link rel="stylesheet" href="main.css">
+<link rel="stylesheet" href="tab.css">
 
-<script src="mapkit/utils.js"></script>
 <script src="mapkit/delaunator.js"></script>
+<script src="mapkit/utils.js"></script>
 <script src="mapkit/randMapBuilder.js"></script>
 <script src="mapkit/map.js"></script>
+<script src="inputHandler.js"></script>
+
 <script src="classes.js"></script>
+<script src="bots.js"></script>
+<script src="artist.js"></script>
+<script src="main.js"></script>
+<script src="stats.js"></script>
+
 <script src="ui.js"></script>
 
 <body>
@@ -20,7 +28,9 @@
             <option>Galcon Galaxy 7</option>
             <option>Galcon Galaxy 8</option>
             <option>Galcon Snowflake 1</option>
-            <option>Galcon Snowflake 2</option>       
+            <option>Galcon Snowflake 2</option>     
+            <option>Aphid Galaxy 1</option>  
+            <option>Micro Galaxy</option>
         </select>
         <br>
         <label for="factionCountdrp">Number of Factions: </label>
@@ -48,6 +58,36 @@
         <br>
         <button id="startBtn" onclick="startBtnClick()">Start</button>
     </div>
+    <div>
+        <div id="tabBar" class="tabBar">
+            <button class="tabLink" id="mapTabBtn" onclick="openTab(event, 'canvasDiv')">Map</button>
+            <button class="tabLink" id="statsTabBtn" onclick="statsTabClick(event, gameData)">Stats</button>
+            <button class="tabLink" id="settingsTabBtn" onclick="openTab(event, 'settingsDiv')">Settings</button>
+        </div>
+        <div id="canvasDiv" class="tabContent">
+            <canvas id="gameboard" class="gameCanvas"></canvas>
+        </div>
+        <div id="statsDiv" class="tabContent">
+            <div id="scoresDiv" class="holder-bordered">
+                Scores:
+                <div id="scoreBox">
+                    Ooops! Scores ded :(       
+                </div>
+            </div>
+        </div>
+        <div id="settingsDiv" class="tabContent">
+            SETTINGS
+            Coming soon
+            <ul>
+                <li>-Minimum zoom to stop displaying labels</li>
+                <li>-Toggle for displaying faction labels</li>
+                <li>-Toggle for displaying ships (in spectator mode)</li>
+                <li>-Pan vs click sensitivity</li>
+                <li>-Minimum click radius for stars</li>
+            </ul>          
+        </div>
+    </div>
+    <script src="testPage.js"></script>
     <script>
         var maxAllowedPlayers = 250;
         var factions = [];
@@ -57,5 +97,7 @@
         initFactionListings();
         toggleFactionCountSelect();
         togglePlayerCountSelect();
+        tabBar.style.display = "none";
+        gameboard.style.display = "none";
     </script>
 </body>

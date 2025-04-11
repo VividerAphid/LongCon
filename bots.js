@@ -17,6 +17,7 @@ class targetDrone extends bot{
     constructor(id, name){
         super(id, name);
         this.target = "";
+        this.moveTurnSkips = 0;
     }
     onStart(map){
         this.findNearestTarget();
@@ -30,7 +31,12 @@ class targetDrone extends bot{
         if(this.ship.flying){
             return "fly";
         }
+        else if(this.moveTurnSkips > 0){
+            this.moveTurnSkips -= 1;
+            return "fly"; //Just to make turn skipped in botMove()
+        }
         else{
+            this.moveTurnSkips  = Math.floor(Math.random()*3);
             return this.ship.at;
         }
     }
@@ -40,7 +46,7 @@ class targetDrone extends bot{
                 let targs = this.faction.targets;
                 let closest = {x: -100000, y:-100000};
                 let nearby = [];
-                let nearThreshold = 200;
+                let nearThreshold = 300;
                 for(let r = 0; r < targs.length; r++){
                     let closestDist = findLengthPoints(this.ship.x, closest.x, this.ship.y, closest.y);
                     let currTargDist = findLengthPoints(this.ship.x, targs[r].x, this.ship.y, targs[r].y);
@@ -200,6 +206,28 @@ class coordinator extends bot{
         toggleTarget(map, this.faction, targetStar);
         this.faction.targets = removeItem(this.faction.targets, targetStar);
     }
+    clearTargets(map){
+        //Remove all faction targets
+        let targets = this.faction.targets;
+        for(let r = 0; r < targets.length; r++){
+            this.removeTarget(map, targets[r]);
+        }
+    }
+    checkTargetsInProxy(map, capturedStar){
+        //checks if any targets lost proximity when capturedStar was taken
+        //returns list of any targets removed
+        let cons = capturedStar.connections;
+        let removed = [];
+            for(let t in cons){
+                if(this.faction.targets.includes(map[cons[t]])){
+                    if(checkProximity(map[cons[t]], map, this.faction.id) == false){
+                        this.removeTarget(map, map[cons[t]]);
+                        removed.push(map[cons[t]]);
+                    }
+                }
+            }
+        return removed;
+    }
 }
 class dummyCoordinator extends coordinator{
     constructor(id, name){
@@ -207,8 +235,10 @@ class dummyCoordinator extends coordinator{
         this.isCoordinator = true;
     }
     onStart(map){
+        //Do nothing because we are a dummy!!
     }
     mapUpdate(map){
+        //Do nothing because we are a dummy!!
     }
 }
 
@@ -261,14 +291,7 @@ class basicCoordinator extends coordinator{
             }
         }
         else if(event.type == "capture" && event.attacker.faction != this.faction){
-            let cons = event.target.connections;
-            for(let t in cons){
-                if(this.faction.targets.includes(map[cons[t]])){
-                    if(checkProximity(map[cons[t]], map, this.faction.id) == false){
-                        this.removeTarget(map, map[cons[t]]);
-                    }
-                }
-            }
+            this.checkTargetsInProxy(map, event.target);
         }
     }
 }
@@ -278,13 +301,14 @@ class coordinatorCheapGrab extends coordinator{
     //prefer a floodfill style expansion, retaking cluster stars
     constructor(id, name){
         super(id, name);
-        this.cluster = [];
+        this.cluster = []; //The group of stars we decide to protect
         this.prodCycles = 0;
-        this.desired = [];
+        this.desired = []; //The group of stars we want
+        this.lostProxies = []; //Targets we lost proximity to but still might want
         this.extra = {};
         this.grabbingCheaps = true;
-        this.grabCheapsEnd = 10;
-        this.cheapsThreshold = .5;
+        this.grabCheapsEnd = 10; //How many prod ticks until we stop grabbing cheaps
+        this.cheapsThreshold = .5; //% of neutCostCap we are willing to target
     }
     onStart(map, extra){
         let owned = this.getOwned(map);
@@ -302,6 +326,7 @@ class coordinatorCheapGrab extends coordinator{
             this.prodCycles++;
             if(this.prodCycles == this.grabCheapsEnd){
                 this.grabbingCheaps = false;
+                this.pickCluster(map);
             }
         }
         if(event.type == "capture"){
@@ -309,27 +334,113 @@ class coordinatorCheapGrab extends coordinator{
                 if(this.desired.includes(event.target)){
                     this.desired = removeItem(this.desired, event.target);
                     this.removeTarget(map, event.target);
+                    if(this.grabbingCheaps == false){
+                        this.cluster.push(event.target);
+                    }
                 }
                 if(this.grabbingCheaps){
-                    this.selectConnectedCheaps(map, event.target);
+                    this.retargetLostProxies(map, event.target);
+                    if(this.faction.targets.length == 0){
+                        while(this.desired.length == 0){
+                            for(let r = 0; r < owned.length; r++){
+                                this.selectConnectedCheaps(map, owned[r]);
+                            }
+                            this.cheapsThreshold += .1; //increase in case we don't find any somehow
+                        }
+                        this.cheapsThreshold = .5; //reset after we are done looking
+                    }
+                    else{
+                        this.selectConnectedCheaps(map, event.target);
+                    }
+                }
+                else{
+                    
                 }
             }
             else{
-               //check if proximity was lost to a target
+               if(event.defender.faction.id == this.faction.id){
+                    let lost = this.checkTargetsInProxy(map, event.target);
+                    for(let r = 0; r < lost.length; r++){
+                        this.lostProxies.push(lost[r]);
+                    }
+                    if(this.cluster.includes(event.target)){
+                        this.addTarget(map, event.target);
+                    }
+               }
                 
             }
-        }
-        
+        }      
     }
     selectConnectedCheaps(map, target){ 
         let cons = target.connections;
         for(let r = 0; r < cons.length; r++){
             let connection = map[cons[r]];
-            if(connection.defense < this.extra.neutCostCap * this.cheapsThreshold && connection.owner.faction.id != this.faction.id){
+            if(connection.defense < this.extra.neutCostCap * this.cheapsThreshold && connection.owner.faction.id != this.faction.id && this.faction.targets.includes(target)==false){
                 this.desired.push(connection);
                 this.addTarget(map, connection);
             }
         }
+    }
+    retargetLostProxies(map, newCapture){
+        let cons = newCapture.connections;
+        for(let r = 0; r < cons.length; r++){
+            let con = map[cons[r]];
+            if(this.lostProxies.includes(con)){
+                this.addTarget(map, con);
+                this.lostProxies = removeItem(this.lostProxies, con);
+            }
+        }
+    }  
+    pickCluster(map){
+        if(this.getOwned(map).length > 0){
+            this.sizeClusters(map, this.faction);
+            this.clearTargets(map);
+            for(let r = 0; r < this.cluster.length; r++){
+                this.addTarget(map, this.cluster[r]);
+            }
+        }
+    }
+    sizeClusters(map, targetFaction){
+        //BFS to count up which cluster is the biggest
+        //targetFaction to specify which faction we are looking at
+        let owned = this.getOwned(map);
+        let visited = [];
+        let visitedCount = 0;
+        let visitQueue = [owned[0]];
+        let clusters = [];
+
+        owned.forEach(function(){visited.push(false);});
+
+        while(visitedCount < owned.length){
+            let currentCluster = [];
+            clusters.push(currentCluster);
+            visited[owned.indexOf(visitQueue[0])] = true;
+            visitedCount++;
+            
+            while(visitQueue.length > 0){
+                let visiting = visitQueue[0];
+                currentCluster.push(visiting);
+                for(let r = 0; r < visiting.connections.length; r++){
+                    let connectionID = visiting.connections[r];
+                    if(map[connectionID].owner.faction.id == targetFaction.id){
+                        if(visited[owned.indexOf(map[connectionID])] == false){
+                            visitQueue.push(map[connectionID]);
+                            visited[owned.indexOf(map[connectionID])] = true;
+                            visitedCount++;
+                        }
+                    }
+                }
+                visitQueue.shift();
+            }
+            for(let r = 0; r < visited.length; r++){
+                if(visited[r] == false){
+                    visitQueue.push(owned[r]);
+                    break;
+                }
+            }
+        }
+        clusters.sort();
+        this.cluster = clusters[clusters.length-1]; //default sort sorts smallest to biggest, grab the very end
     }
 
 }

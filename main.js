@@ -56,13 +56,16 @@ function loadTestFactions(count){
 
 function loadFactions(facs){
     let factions = [];
+    let names = nouns.slice();
     let charSet = ['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l', 'm', 'n', 'o', 'p', 'q', 'r', 's', 't', 'u', 'v',
         'w', 'x', 'y', 'z', '1', '2', '3', '4', '5', '6', '7', '8', '9', '0'];
     for(let r = 0; r < facs.length; r++){
-        let charPicks = [Math.floor(Math.random()*charSet.length), Math.floor(Math.random()*charSet.length)];
-        let chars = charSet[charPicks[0]] + charSet[charPicks[1]];
+        let charPicks = [Math.floor(Math.random()*charSet.length), Math.floor(Math.random()*charSet.length), Math.floor(Math.random()*charSet.length)];
+        let chars = charSet[charPicks[0]] + charSet[charPicks[1]] + charSet[charPicks[2]];
         let colors = facs[r].colors;
-        factions.push(new faction(r+1, "Fac"+r+1, {color: colors[0], chars: chars, inverse: colors[1]}));
+        let namePick = Math.floor(Math.random()*names.length);
+        factions.push(new faction(r+1, names[namePick], {color: colors[0], chars: chars, inverse: colors[1]}));
+        names = removeAtIndex(names, namePick);
         factions[r].players = [];
     }
     return factions;
@@ -79,6 +82,7 @@ function loadCoordinators(factions){
         }
         else{
             let coord = new basicCoordinator(r, "Basic Coordinator");
+            //let coord = new coordinatorCheapGrab(r, "Cheapgrab Coordinator");
             coord.faction = factions[r];
             factions[r].coordinator = coord;
             coordinators.push(coord);
@@ -142,29 +146,32 @@ function addDefense(map){
 }
 
 function render(gameData){
-    gameData.artist.fillRect(0, 0, gameboard.width, gameboard.height, "#222", "#222");
-    for(let r = 0; r < gameData.map.length; r++){
-        gameData.map[r].drawConnections(gameData.artist, gameData.map);
-    }
-
-    if(!gameData.spectateMode){
-        let targeted = gameData.humanPlayer.faction.targets;
-        for(let r = 0; r < targeted.length; r++){
-            gameData.artist.drawTargetPointer(targeted[r].x, targeted[r].y, targeted[r].radius);
+    //gameData.artist.ctx.clearRect(0, 0, gameboard.width, gameboard.height);
+    if(canvasDiv.style.display != "none"){
+        for(let r = 0; r < gameData.map.length; r++){
+            gameData.map[r].drawConnections(gameData.artist, gameData.map);
         }
-    }
     
-    for(let r = 0; r < gameData.map.length; r++){
-        gameData.map[r].drawStar(gameData.artist);
-    }
-    
-    for(let r = 0; r < gameData.map.length; r++){
-        gameData.map[r].drawLabels(gameData.artist);
-        if(gameData.debug){
-            gameData.map[r].drawDebugs(gameData.artist);
+        if(!gameData.spectateMode){
+            let targeted = gameData.humanPlayer.faction.targets;
+            for(let r = 0; r < targeted.length; r++){
+                gameData.artist.drawTargetPointer(targeted[r].x, targeted[r].y, targeted[r].radius);
+            }
         }
-    }
-    
+        
+        for(let r = 0; r < gameData.map.length; r++){
+            gameData.map[r].drawStar(gameData.artist);
+        }
+        
+        if(gameData.artist.cameraZoom >= .6){
+            for(let r = 0; r < gameData.map.length; r++){
+                gameData.map[r].drawLabels(gameData.artist);
+                if(gameData.debug){
+                    gameData.map[r].drawDebugs(gameData.artist);
+                }
+            }
+        }
+        
         for(let r = 0; r < gameData.ships.length; r++){
             if(gameData.spectateMode){
                 gameData.ships[r].draw(gameData.artist);
@@ -180,6 +187,7 @@ function render(gameData){
                 }
             }
         }
+    }
 }
 
 function uiSetup(gameData){
@@ -296,12 +304,20 @@ function checkHit(gameData, isLongpress){
         let r;
         let map = gameData.map;
         let player = gameData.humanPlayer;
+        let artist = gameData.artist;
         let reps = map.length;
-            for(r=0; r<reps;r++){
+        let transform = artist.ctx.getTransform();
+        let inverse = transform.inverse();
+        let transformedPoint = inverse.transformPoint({x:x, y:y});
+        //(ax+cy+e,bx+dy+f)
+        let transMouseX = transformedPoint.x;
+        let transMouseY = transformedPoint.y;
+        for(r=0; r<reps;r++){
             let clickRad = map[r].radius*2;
             if(clickRad < 10) clickRad = 10;
-            if (x >= (map[r].x - clickRad) && x <= (map[r].x + clickRad)){
-                if (y >= (map[r].y - clickRad) && y <= (map[r].y + clickRad)){
+            if (transMouseX >= (map[r].x - clickRad) && transMouseX <= (map[r].x + clickRad)){
+                if (transMouseY >= (map[r].y - clickRad) && transMouseY <= (map[r].y + clickRad)){
+                    //console.log("Clicked: "+r);
                     if(isLongpress){
                         if(checkProximity(map[r], map, player.faction.id) || player.faction.targets.includes(map[r])){
                             toggleTarget(map, player.faction, map[r]);
