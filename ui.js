@@ -271,7 +271,7 @@ function adjustZoom(art, zoomAmount, zoomFactor)
 function updateTranslationAndZoom(gameData){
   //console.log("updater");
   let art = gameData.artist;
-  art.ctx.reset();
+  art.ctx.resetTransform();
   art.ctx.clearRect(0, 0, art.ctx.canvas.width, art.ctx.canvas.height);
   art.ctx.imageSmoothingEnabled = false;
   art.ctx.translate((-art.ctx.canvas.width / 2) + art.cameraOffset.x, (-art.ctx.canvas.height / 2) + art.cameraOffset.y);
