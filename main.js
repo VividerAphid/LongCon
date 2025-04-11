@@ -315,42 +315,39 @@ function checkHit(gameData, isLongpress){
         for(r=0; r<reps;r++){
             let clickRad = map[r].radius*2;
             if(clickRad < 10) clickRad = 10;
-            if (transMouseX >= (map[r].x - clickRad) && transMouseX <= (map[r].x + clickRad)){
-                if (transMouseY >= (map[r].y - clickRad) && transMouseY <= (map[r].y + clickRad)){
-                    //console.log("Clicked: "+r);
-                    if(isLongpress){
-                        if(checkProximity(map[r], map, player.faction.id) || player.faction.targets.includes(map[r])){
-                            toggleTarget(map, player.faction, map[r]);
+            if(circlePointCheck({x: map[r].x, y: map[r].y, radius: clickRad}, {x: transMouseX, y: transMouseY})){
+                if(isLongpress){
+                    if(checkProximity(map[r], map, player.faction.id) || player.faction.targets.includes(map[r])){
+                        toggleTarget(map, player.faction, map[r]);
+                        render(gameData);
+                    }
+                }
+                else{
+                    if(map[r] != player.ship.at){
+                        if(map[r].faction.id == player.faction.id){
+                            //console.log("flying!");
+                            player.ship.fly(map[r]);
                             render(gameData);
                         }
-                    }
-                    else{
-                        if(map[r] != player.ship.at){
-                            if(map[r].faction.id == player.faction.id){
+                        else{
+                            if(checkProximity(map[r], map, player.faction.id)){
                                 //console.log("flying!");
                                 player.ship.fly(map[r]);
                                 render(gameData);
                             }
-                            else{
-                                if(checkProximity(map[r], map, player.faction.id)){
-                                    //console.log("flying!");
-                                    player.ship.fly(map[r]);
-                                    render(gameData);
-                                }
-                            }
-                            break;
                         }
-                        else{
-                            if(checkProximity(map[r], map, player.faction.id && player.attacked == false)){
-                                let moveEvent = move(gameData, map[r], player);
-                                botMapUpdate(gameData, moveEvent);
-                                render(gameData);
-                            }
+                        break;
+                    }
+                    else{
+                        if(checkProximity(map[r], map, player.faction.id && player.attacked == false)){
+                            let moveEvent = move(gameData, map[r], player);
+                            botMapUpdate(gameData, moveEvent);
+                            render(gameData);
                         }
-                    }               
-                }
+                    }
+                }               
             }
-            }
+        }
     }
 }
 

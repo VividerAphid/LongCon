@@ -29,6 +29,21 @@ function removeDupes(arr){
 		})
 	return filtered;
 }
+
+function circlePointCheck(circle, point){
+	//circle expects (x, y, radius)
+	//point expects (x, y)
+	let deltaX = circle.x - point.x;
+	let deltaY = circle.y - point.y;
+	return (deltaX * deltaX + deltaY * deltaY) < (circle.radius * circle.radius)
+}
+function rectangleCircleCheck(circle, rectangle){
+	//circle expects (x, y, radius)
+	//rectangle expects (x, y, width, height)
+	let deltaX = circle.y - Max(rectangle.x, Min(circle.y, rectangle.x + rectangle.width));
+	let deltaY = circle.y - Max(rectangle.y, Min(circle.y, rectangle.y + rectangle.height));
+	return (deltaX * deltaX + deltaY * deltaY) < (circle.radius * circle.radius);
+}
 function findLength(p0,p1, coords){
 	var x = coords[p0][0] - coords[p1][0];
 	var y = coords[p0][1] - coords[p1][1];
