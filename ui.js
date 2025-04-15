@@ -281,8 +281,8 @@ function updateTranslationAndZoom(gameData){
 }
 
 function setCanvasDimensions(){
-  gameboard.width = (window.innerWidth)*.97;
-  gameboard.height = (window.innerHeight)*.9;
+  gameboard.width = (document.documentElement.clientWidth)*.97;
+  gameboard.height = (document.documentElement.clientHeight)*.9;
 }
 
 function initListeners(gameData){
