@@ -176,8 +176,8 @@ function onPointerDown(e, art)
 {
   //console.log("pointerdown");
     art.isDragging = true;
-    art.dragStart.x = getEventLocation(e).x/ art.cameraZoom - art.cameraOffset.x;
-    art.dragStart.y = getEventLocation(e).y/ art.cameraZoom - art.cameraOffset.y;
+    art.dragStart.x = getEventLocation(e).x - art.cameraOffset.x; //getEventLocation(e).x / art.cameraZoom - art.cameraOffset.x;
+    art.dragStart.y = getEventLocation(e).y - art.cameraOffset.y; //getEventLocation(e).y / art.cameraZoom - art.cameraOffset.y;
     art.mouseDownStart.x = getEventLocation(e).x;
     art.mouseDownStart.y = getEventLocation(e).y;
 }
@@ -203,12 +203,12 @@ function onPointerMove(e, art)
     if (art.isDragging)
     {
       //console.log("checking drag");
-      tempOffsetX = getEventLocation(e).x / art.cameraZoom - art.dragStart.x;
-      tempOffsetY = getEventLocation(e).y / art.cameraZoom - art.dragStart.y;
+      tempOffsetX = getEventLocation(e).x - art.dragStart.x;
+      tempOffsetY = getEventLocation(e).y - art.dragStart.y;
       if(art.cameraOffset.x != tempOffsetX ||  art.cameraOffset.y != tempOffsetY){
         //console.log("drag");
-        art.cameraOffset.x = getEventLocation(e).x / art.cameraZoom - art.dragStart.x;
-        art.cameraOffset.y = getEventLocation(e).y / art.cameraZoom - art.dragStart.y;
+        art.cameraOffset.x = getEventLocation(e).x - art.dragStart.x;
+        art.cameraOffset.y = getEventLocation(e).y - art.dragStart.y;
         art.dragChanged = true;
       }
       
