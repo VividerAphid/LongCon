@@ -148,8 +148,23 @@ function addDefense(map){
 function render(gameData){
     //gameData.artist.ctx.clearRect(0, 0, gameboard.width, gameboard.height);
     if(canvasDiv.style.display != "none"){
-        for(let r = 0; r < gameData.map.length; r++){
-            gameData.map[r].drawConnections(gameData.artist, gameData.map);
+        // let transform = gameData.artist.ctx.getTransform();
+        // let inverse = transform.inverse();
+        // let map = gameData.map;
+        // let onscreen = [];
+        // let transformRect = {x:0, y:0};//inverse.transformPoint({x:0, y:0});
+        // let canvasRect = {x: transformRect.x, y: transformRect.y, width:gameboard.width, height:gameboard.height};
+        // for(let r = 0; r < gameData.map.length; r++){
+        //     let star = gameData.map[r];
+        //     let transformed = inverse.transformPoint({x: star.x, y: star.y});
+        //     if(rectangleCircleCheck({x:transformed.x, y:transformed.y, radius:star.radius}, canvasRect)){
+        //         onscreen.push(star);
+        //     }
+        // }
+        //console.log(onscreen.length);
+        //map = onscreen;
+        for(let r = 0; r < map.length; r++){
+            map[r].drawConnections(gameData.artist, gameData.map);
         }
     
         if(!gameData.spectateMode){
@@ -159,15 +174,15 @@ function render(gameData){
             }
         }
         
-        for(let r = 0; r < gameData.map.length; r++){
-            gameData.map[r].drawStar(gameData.artist);
+        for(let r = 0; r < map.length; r++){
+            map[r].drawStar(gameData.artist);
         }
         
-        if(gameData.artist.cameraZoom >= .6){
-            for(let r = 0; r < gameData.map.length; r++){
-                gameData.map[r].drawLabels(gameData.artist);
+        if(gameData.artist.cameraZoom >= gameData.settings.minLabelDrawDistance){
+            for(let r = 0; r < map.length; r++){
+                map[r].drawLabels(gameData.artist, gameData.settings.drawFactionLabels);
                 if(gameData.debug){
-                    gameData.map[r].drawDebugs(gameData.artist);
+                    map[r].drawDebugs(gameData.artist);
                 }
             }
         }

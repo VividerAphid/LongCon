@@ -40,8 +40,8 @@ function circlePointCheck(circle, point){
 function rectangleCircleCheck(circle, rectangle){
 	//circle expects (x, y, radius)
 	//rectangle expects (x, y, width, height)
-	let deltaX = circle.y - Max(rectangle.x, Min(circle.y, rectangle.x + rectangle.width));
-	let deltaY = circle.y - Max(rectangle.y, Min(circle.y, rectangle.y + rectangle.height));
+	let deltaX = circle.x - Math.max(rectangle.x, Math.min(circle.x, rectangle.x + rectangle.width));
+	let deltaY = circle.y - Math.max(rectangle.y, Math.min(circle.y, rectangle.y + rectangle.height));
 	return (deltaX * deltaX + deltaY * deltaY) < (circle.radius * circle.radius);
 }
 function findLength(p0,p1, coords){

@@ -162,6 +162,16 @@ function startBtnClick(){
     menuDiv.style.display = "none";
 }
 
+function minZoomChange(wasSlider){
+    if(wasSlider){
+        minZoomInp.value = minZoomSlider.value;
+    }
+    else{
+        minZoomSlider.value = minZoomInp.value;
+    }
+    gameData.settings.minLabelDrawDistance = minZoomInp.value * 1;
+}
+
 function getEventLocation(e)
 {
     if (e.touches && e.touches.length == 1){
@@ -291,6 +301,9 @@ function initListeners(gameData){
     gameboard.style.display = "inline";
     tabBar.style.display = "block";
     mapTabBtn.click();
+    minZoomSlider.onchange = function(){minZoomChange(true, gameData);};
+    minZoomInp.onchange = function(){minZoomChange(false, gameData);};
+    drawFacLabelsChx.onchange = function(){gameData.settings.drawFactionLabels = drawFacLabelsChx.checked};
     gameboard.addEventListener('mousedown', (e) => onPointerDown(e, gameData.artist));
     gameboard.addEventListener('touchstart', (e) => handleTouch(e, onPointerDown, gameData.artist, gameData));
     gameboard.addEventListener('mouseup', (e) => onPointerUp(e, gameData.artist, gameData));

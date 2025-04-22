@@ -64,12 +64,14 @@ class star{
     drawStar(art){
         art.drawStar(this.x, this.y, this.color, this.radius);
     }
-    drawLabels(art){
+    drawLabels(art, drawFactionLabels){
         let constMult = "";
         if(this.constShowing){constMult = " (x2)"}
         art.drawText(this.x-this.labelOffsets.dXOffset, this.y-this.labelOffsets.dYOffset, this.defense, art.labelFont, this.color); //Defense label
         art.drawText(this.x-this.labelOffsets.pXOffset, this.y+this.labelOffsets.pYOffset, "+"+this.prod + constMult, art.labelFont, this.color); //Prod label       
-        art.drawText(this.x-7, this.y, this.colorChars, art.labelFont, this.colorInverse);
+        if(drawFactionLabels){
+            art.drawText(this.x-7, this.y, this.colorChars, art.labelFont, this.colorInverse);
+        }
     }
     drawDebugs(art){
         art.drawText(this.x-10, this.y, this.id, art.labelFont, "#f00");
@@ -251,5 +253,10 @@ class game{
         this.width = "";
         this.height = "";
         this.neutCostCap = 0;
+        this.settings = {
+            minLabelDrawDistance : .6,
+            drawShipsInSpectator: true,
+            drawFactionLabels: true,
+        };
     }
 }
