@@ -18,17 +18,47 @@ class targetDrone extends bot{
         super(id, name);
         this.target = "";
         this.moveTurnSkips = 0;
+        this.orders = ""; //Will be either {stack:false}, {stack:true, stackThreshold:num, noCap:true/false}
+        this.enabled = true;
     }
     onStart(map){
         this.findNearestTarget();
     }
     mapUpdate(map, moveEvent){
-        if(moveEvent.type == "target"){
-            this.findNearestTarget();
+        if(this.enabled){
+            if(moveEvent.type == "target" && this.orders == ""){
+                this.findNearestTarget();
+            }
+            else{
+                if(this.orders != ""){
+                    if(moveEvent.type = "capture" && moveEvent.target == this.target){
+                        if(this.orders.stack){
+                            if(this.orders.noCap == false){
+                                if(this.target.defense >= this.orders.threshold){
+                                    this.orders = "";
+                                    this.findNearestTarget();
+                                }
+                            }
+                        }
+                        else{
+                            this.orders = "";
+                            this.findNearestTarget();
+                        }
+                    }
+                    if(moveEvent.type = "defend" && moveEvent.target == this.target){
+                        if(this.orders.noCap == false){
+                            if(this.target.defense >= this.orders.threshold){
+                                this.orders = "";
+                                this.findNearestTarget();
+                            }
+                        }
+                    }
+                }
+            }
         }
     }
     makeMove(map){
-        if(this.ship.flying){
+        if(this.ship.flying || this.enabled == false){
             return "fly";
         }
         else if(this.moveTurnSkips > 0){
@@ -72,6 +102,15 @@ class targetDrone extends bot{
                 }
                 this.ship.fly(this.target); 
             }    
+        }
+    }
+    setOrders(target, threshold, noCap=false){
+        this.target = target;
+        if(threshold != null){
+            this.orders = {stack: true, threshold: threshold, noCap: noCap}
+        }
+        else{
+            this.orders = {stack: false};
         }
     }
 }
@@ -127,7 +166,7 @@ class basicBot extends bot{
     updateTargets(map){
         //console.log("updateTarget");
         //console.log(this.targets);
-        if(this.getOwned(map).length > 0){
+        if(this.getOwned().length > 0){
         for(let r = 0; r < this.targets.length; r++){
             if(map[this.targets[r]].faction.id == this.faction.id || checkProximity(map[this.targets[r]], map, this.faction.id)==false){
                 //console.log("found out of proxy!");
@@ -159,7 +198,7 @@ class basicBot extends bot{
     getNewTargSet(map){
         //console.log("New target set!");
         let options = [];
-        let owned = this.getOwned(map);
+        let owned = this.getOwned();
         for(let r = 0; r < owned.length; r++){
             let cons = owned[r].connections;
             for(let t = 0; t < cons.length; t++){
@@ -247,7 +286,7 @@ class basicCoordinator extends coordinator{
         super(id, name);
     }
     onStart(map){
-        let spawns = this.getOwned(map);
+        let spawns = this.getOwned();
         let defense = 0;
         let options = [];
         for(let r = 0; r < spawns.length; r++){
@@ -311,7 +350,7 @@ class coordinatorCheapGrab extends coordinator{
         this.cheapsThreshold = .5; //% of neutCostCap we are willing to target
     }
     onStart(map, extra){
-        let owned = this.getOwned(map);
+        let owned = this.getOwned();
         this.extra = extra;
         while(this.desired.length == 0){
             for(let r = 0; r < owned.length; r++){
@@ -392,7 +431,7 @@ class coordinatorCheapGrab extends coordinator{
         }
     }  
     pickCluster(map){
-        if(this.getOwned(map).length > 0){
+        if(this.getOwned().length > 0){
             this.sizeClusters(map, this.faction);
             this.clearTargets(map);
             for(let r = 0; r < this.cluster.length; r++){
@@ -403,7 +442,7 @@ class coordinatorCheapGrab extends coordinator{
     sizeClusters(map, targetFaction){
         //BFS to count up which cluster is the biggest
         //targetFaction to specify which faction we are looking at
-        let owned = this.getOwned(map);
+        let owned = this.getOwned();
         let visited = [];
         let visitedCount = 0;
         let visitQueue = [owned[0]];

@@ -268,7 +268,7 @@ function adjustZoom(art, zoomAmount, zoomFactor)
           art.cameraZoom += zoomAmount;
         }
         else if (zoomFactor){
-            console.log(zoomFactor);
+            //console.log(zoomFactor);
             art.cameraZoom = zoomFactor*art.lastZoom;
         }
         
@@ -304,6 +304,7 @@ function initListeners(gameData){
     minZoomSlider.onchange = function(){minZoomChange(true, gameData);};
     minZoomInp.onchange = function(){minZoomChange(false, gameData);};
     drawFacLabelsChx.onchange = function(){gameData.settings.drawFactionLabels = drawFacLabelsChx.checked};
+    drawSpectateShipsChx.onchange = function(){gameData.settings.drawShipsInSpectator = drawSpectateShipsChx.checked};
     gameboard.addEventListener('mousedown', (e) => onPointerDown(e, gameData.artist));
     gameboard.addEventListener('touchstart', (e) => handleTouch(e, onPointerDown, gameData.artist, gameData));
     gameboard.addEventListener('mouseup', (e) => onPointerUp(e, gameData.artist, gameData));

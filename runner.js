@@ -15,7 +15,8 @@ let plaShipPack = loadTestPlayersAndShips(gameData.factions, playerCountinp.valu
 gameData.players = plaShipPack[0];
 gameData.ships = plaShipPack[1];
 if(gameData.spectateMode == false){
-    var player1 = new player(1, "Player");
+    var player1 = new targetDrone(1, "Player");
+    player1.enabled = false; //disabling autopilot mode
     var player1Ship = new ship(1, player1);
     player1.faction = gameData.factions[0];
     gameData.factions[0].players[0] = player1;
@@ -26,6 +27,7 @@ if(gameData.spectateMode == false){
     gameData.ships[0].player = player1;
 }
 gameData.map = pickSpawns(gameData, Math.floor(Math.random()*50)+1, 0);
+loadFactionsOwned(gameData);
 gameData.coordinators = loadCoordinators(gameData.factions);
 setShipSpawns(gameData);
 

@@ -14,8 +14,8 @@ class player{
     get color(){
         return this.faction.color;
     }
-    getOwned(map){
-        return this.faction.getOwned(map);
+    getOwned(){
+        return this.faction.getOwned();
     }
     getOwnedIds(map){
         return this.faction.getOwnedIds(map);
@@ -188,6 +188,7 @@ class faction{
         this.players = [];
         this.targets = [];
         this.coordinator = "";
+        this.owned = [];
     }
     get color(){
         return this.colorSet.color;
@@ -198,18 +199,12 @@ class faction{
     get colorChars(){
         return this.colorSet.chars;
     }
-    getOwned(map){
-        let owned = [];
-        for(let r = 0; r < map.length; r++){
-            if(map[r].faction.id == this.id){
-                owned.push(map[r]);
-            }
-        }
-        return owned;
+    getOwned(){
+        return this.owned;
     }
     getScore(map){
         //Return score / prod value
-        let owned = this.getOwned(map);
+        let owned = this.getOwned();
         let score = 0;
         for(let r in owned){
             score += owned[r].prod;
@@ -221,7 +216,7 @@ class faction{
     }
     getTotalDefense(map){
         //Return total defense across all owned stars
-        let owned = this.getOwned(map);
+        let owned = this.getOwned();
         let defense = 0;
         for(let r in owned){
             defense += owned[r].defense;
@@ -229,13 +224,28 @@ class faction{
         return defense;
     }
     getOwnedIds(map){
+        let ids = [];
+        for(let r = 0; r < this.owned.length; r++){
+            ids.push(this.owned[r].id);
+        }
+        return ids;
+    }
+    updateOwned(target, isRemove){
+        if(isRemove){
+            this.owned = removeItem(this.owned, target);
+        }
+        else{
+            this.owned.push(target);
+        }
+    }
+    calcInitialOwned(map){
         let owned = [];
         for(let r = 0; r < map.length; r++){
             if(map[r].faction.id == this.id){
-                owned.push(map[r].id);
+                owned.push(map[r]);
             }
         }
-        return owned;
+        this.owned = owned;
     }
 }
 

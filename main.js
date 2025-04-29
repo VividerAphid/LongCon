@@ -64,7 +64,7 @@ function loadFactions(facs){
         let chars = charSet[charPicks[0]] + charSet[charPicks[1]] + charSet[charPicks[2]];
         let colors = facs[r].colors;
         let namePick = Math.floor(Math.random()*names.length);
-        factions.push(new faction(r+1, names[namePick], {color: colors[0], chars: chars, inverse: colors[1]}));
+        factions.push(new faction(r+1, names[namePick], {color: colors[0], chars: chars, inverse: colors[1]}, map));
         names = removeAtIndex(names, namePick);
         factions[r].players = [];
     }
@@ -111,11 +111,17 @@ function loadTestPlayersAndShips(factions, perFaction){
     return [players, ships];
 }
 
+function loadFactionsOwned(gameData){
+    for(let r = 0; r < gameData.factions.length; r++){
+        gameData.factions[r].calcInitialOwned(gameData.map);
+    }
+}
+
 function setShipSpawns(gameData){
     let map = gameData.map;
     let ships = gameData.ships;
     for(let r = 0; r < ships.length; r++){
-        let list = ships[r].player.getOwned(map);
+        let list = ships[r].player.getOwned();
         let pick = Math.floor(Math.random()*list.length);
         let spawn = list[pick];
         ships[r].setStart(spawn);
@@ -189,7 +195,9 @@ function render(gameData){
         
         for(let r = 0; r < gameData.ships.length; r++){
             if(gameData.spectateMode){
-                gameData.ships[r].draw(gameData.artist);
+                if(gameData.settings.drawShipsInSpectator){
+                    gameData.ships[r].draw(gameData.artist);
+                }
             }
             else{
                 if(gameData.ships[r].faction.id == gameData.humanPlayer.faction.id || checkProximity(gameData.ships[r].at, gameData.map, gameData.humanPlayer.faction.id)){  
@@ -257,7 +265,7 @@ function checkConstLight(gameData){
 function getAttackValue(map, play){
     let defPercent = play.attackStrength;
     let planPercent = .5;
-    let owned = play.getOwnedIds(map);
+    let owned = play.getOwnedIds();
     let sorted = owned.slice();
     sorted.sort(function(a, b){return map[b].defense - map[a].defense});
     
@@ -281,7 +289,7 @@ function calcAttackValue(map, play){
     //For bots to calculate how hard they will hit
     let defPercent = play.attackStrength;
     let planPercent = .5;
-    let owned = play.getOwnedIds(map);
+    let owned = play.getOwnedIds();
     let sorted = owned.slice();
     sorted.sort(function(a, b){return map[b].defense - map[a].defense});
     
@@ -395,6 +403,11 @@ function move(gameData, target, player){
             moveEvent.type = "capture";
             target.defense = stack - target.defense;
             target.owner = player;
+            player.faction.updateOwned(target, false);
+            if(moveEvent.defender.faction.id != 0){
+                console.log("neut!");
+                moveEvent.defender.faction.updateOwned(target, true);
+            }
             checkConstLight(gameData);
         }
         else{
