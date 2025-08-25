@@ -237,13 +237,16 @@ class coordinator extends bot{
     }
     addTarget(map, targetStar){
         //targetStar actual star reference, NOT ID
-        toggleTarget(map, this.faction, targetStar);
-        this.faction.targets.push(targetStar);
+        if(this.faction.targets.includes(targetStar) == false){
+            toggleTarget(map, this.faction, targetStar);
+        }
+        else{
+            console.log(this.name + this.id + " attempted to add a duplicate target!");
+        }
     }
     removeTarget(map, targetStar){
         //targetStar actual star reference, NOT ID
         toggleTarget(map, this.faction, targetStar);
-        this.faction.targets = removeItem(this.faction.targets, targetStar);
     }
     clearTargets(map){
         //Remove all faction targets
@@ -342,11 +345,11 @@ class coordinatorCheapGrab extends coordinator{
         super(id, name);
         this.cluster = []; //The group of stars we decide to protect
         this.prodCycles = 0;
-        this.desired = []; //The group of stars we want
-        this.lostProxies = []; //Targets we lost proximity to but still might want
+        this.desired = []; //The group of stars we want, format {star: actualStar, from: proxyStar}
+        this.frontStars = []; //Our exposed edge stars, {star: star, openProxies: []}
         this.extra = {};
         this.grabbingCheaps = true;
-        this.grabCheapsEnd = 10; //How many prod ticks until we stop grabbing cheaps
+        this.grabCheapsEnd = 1; //How many prod ticks until we stop grabbing cheaps
         this.cheapsThreshold = .5; //% of neutCostCap we are willing to target
     }
     onStart(map, extra){
@@ -366,21 +369,22 @@ class coordinatorCheapGrab extends coordinator{
             if(this.prodCycles == this.grabCheapsEnd){
                 this.grabbingCheaps = false;
                 this.pickCluster(map);
+                if(this.getOwned().length > 0){
+                    this.targetInitialClusterProxies(map);
+                }
             }
         }
         if(event.type == "capture"){
             if(event.attacker.faction.id == this.faction.id){
-                if(this.desired.includes(event.target)){
-                    this.desired = removeItem(this.desired, event.target);
+                if(this.cluster.includes(event.target) && this.faction.targets.includes(event.target)){
                     this.removeTarget(map, event.target);
-                    if(this.grabbingCheaps == false){
-                        this.cluster.push(event.target);
-                    }
                 }
                 if(this.grabbingCheaps){
-                    this.retargetLostProxies(map, event.target);
+                    if(this.removeFromDesired(event.target)){
+                        this.removeTarget(map, event.target);
+                    }
                     if(this.faction.targets.length == 0){
-                        while(this.desired.length == 0){
+                        while(this.faction.targets.length == 0){
                             for(let r = 0; r < owned.length; r++){
                                 this.selectConnectedCheaps(map, owned[r]);
                             }
@@ -393,16 +397,39 @@ class coordinatorCheapGrab extends coordinator{
                     }
                 }
                 else{
-                    
+                    //this.checkNewCluster(map);
+                    //this.cluster = this.sizeClusters(map, this.faction);
+                    this.cluster.push(event.target);
+                    if(this.desired[event.target.id] != undefined){
+                        let result = this.checkStarCovered(map, this.desired[event.target.id].from);
+                        let from = this.desired[event.target.id].from;
+                        //console.log("From: " + from.id);
+                        this.removeFromDesired(event.target);
+                        this.removeTarget(map, event.target);
+                        if(result.covered){
+                            //console.log("covered!");
+                            let existing = this.frontStars[from.id];
+                            let openProxies = existing.open;
+                            for(let r = 0; r < openProxies.length; r++){
+                                let check = this.checkStarCovered(map, openProxies[r]);
+                                if(check.covered == false){
+                                    this.frontStars[openProxies[r].id] = {star: openProxies[r], open: check.open};
+                                    for(let t = 0; t < check.open.length; t++){
+                                        let openStar = check.open[t];
+                                        this.desired[openStar.id] = {star: openStar, from: openProxies[r]};
+                                        this.addTarget(map, openStar);
+                                    }
+                                }
+                            }
+                            this.frontStars[from.id] = undefined;
+                        }
+                    }
                 }
             }
             else{
                if(event.defender.faction.id == this.faction.id){
-                    let lost = this.checkTargetsInProxy(map, event.target);
-                    for(let r = 0; r < lost.length; r++){
-                        this.lostProxies.push(lost[r]);
-                    }
-                    if(this.cluster.includes(event.target)){
+                    this.checkTargetsInProxy(map, event.target);
+                    if(this.cluster.includes(event.target) && this.faction.targets.includes(event.target) == false && checkProximity(event.target, map, this.faction.id)){
                         this.addTarget(map, event.target);
                     }
                }
@@ -415,28 +442,71 @@ class coordinatorCheapGrab extends coordinator{
         for(let r = 0; r < cons.length; r++){
             let connection = map[cons[r]];
             if(connection.defense < this.extra.neutCostCap * this.cheapsThreshold && connection.owner.faction.id != this.faction.id && this.faction.targets.includes(target)==false){
-                this.desired.push(connection);
+                this.desired[connection.id] = {star: connection, from: target};
                 this.addTarget(map, connection);
             }
         }
+    } 
+    targetInitialClusterProxies(map){
+        for(let r = 0; r < this.cluster.length; r++){
+                let result = this.checkStarCovered(map, this.cluster[r]);
+                if(result.covered == false){
+                    let opens = result.open;
+                    for(let t = 0; t < opens.length; t++){
+                        this.desired[opens[t].id] = {star: opens[t], from: this.cluster[r]};
+                    }
+                    this.frontStars[this.cluster[r].id] = {star: this.cluster[r], open: opens};
+                }
+            }
+        for(let r = 0; r < this.desired.length; r++){
+            if(this.desired[r]){
+                this.addTarget(map, this.desired[r].star);
+            }   
+        }
     }
-    retargetLostProxies(map, newCapture){
-        let cons = newCapture.connections;
-        for(let r = 0; r < cons.length; r++){
-            let con = map[cons[r]];
-            if(this.lostProxies.includes(con)){
-                this.addTarget(map, con);
-                this.lostProxies = removeItem(this.lostProxies, con);
+    checkNewCluster(map){
+        let existingCluster = this.cluster;
+        let newCluster = this.sizeClusters(map, this.faction);
+        let copyCluster = newCluster.slice();
+        for(let r = 0; r < existingCluster.length; r++){
+            copyCluster = removeItem(copyCluster, existingCluster[r]);
+        }
+        for(let r = 0; r < copyCluster.length; r++){
+            let result = this.checkStarCovered(map, copyCluster[r]);
+            if(result.covered == false){
+                let opens = result.open;
+                    for(let t = 0; t < opens.length; t++){
+                        this.desired[opens[t].id] = {star: opens[t], from: copyCluster[r]};
+                        this.addTarget(map, opens[t]);
+                    }
+                    this.frontStars[copyCluster[r].id] = {star: copyCluster[r], open: opens};
             }
         }
-    }  
+        this.cluster = newCluster;
+    }
+    removeFromDesired(target){
+        if(this.desired[target.id] != undefined){
+            this.desired[target.id] = undefined;
+            return true;
+        }
+        return false;
+    }
+    checkStarCovered(map, target){
+        let cons = target.connections;
+        let result = {covered: true, open:[]}
+        for(let r = 0; r < cons.length; r++){
+            if(map[cons[r]].faction != this.faction){
+                result.covered = false;
+                result.open.push(map[cons[r]]);
+            }
+        }
+        return result;
+    }
     pickCluster(map){
         if(this.getOwned().length > 0){
-            this.sizeClusters(map, this.faction);
+            this.cluster = this.sizeClusters(map, this.faction);
             this.clearTargets(map);
-            for(let r = 0; r < this.cluster.length; r++){
-                this.addTarget(map, this.cluster[r]);
-            }
+            this.desired = [];
         }
     }
     sizeClusters(map, targetFaction){
@@ -479,22 +549,7 @@ class coordinatorCheapGrab extends coordinator{
             }
         }
         clusters.sort();
-        this.cluster = clusters[clusters.length-1]; //default sort sorts smallest to biggest, grab the very end
+        return clusters[clusters.length-1]; //default sort sorts smallest to biggest, grab the very end
     }
 
-}
-
-class clusterRushCoordinator extends bot{
-    //Pick a single cluster immediately and expand from that
-    //prefer a floodfill style expansion, retaking cluster stars
-    constructor(id, name){
-        super(id, name);
-        this.isCoordinator = true;
-    }
-    onStart(map){
-        console.log("onStart() not overridden!");
-    }
-    mapUpdate(map){
-        console.log("mapUpdate() not overridden!");
-    }
 }

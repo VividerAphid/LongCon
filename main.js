@@ -139,14 +139,43 @@ function loadDefenseAndNeut(map, defenseCap){
     return map;
 }
 
-function addDefense(map){
-    for(let r = 0; r < map.length; r++){
-        if(map[r].owner.id > 0){
-            let up = map[r].prod;
-            if(map[r].constShowing){
-                up += up;
+function addDefense(map, bucketMode){
+    if(bucketMode){
+        for(let r = 0; r < map.length; r++){
+            if(map[r].owner.id > 0){
+                let cap = map[r].cap;
+                let up = Math.round(cap * .025);
+                map[r].faction.bucket += up;
+                if(map[r].defense > cap){
+                    map[r].faction.bucket += up;
+                    if(map[r].defense - up < cap){
+                        
+                        map[r].defense = cap;
+                    }
+                    else{
+                        map[r].defense -= up;
+                    }
+                }
+                else{
+                    if(map[r].defense + up > cap){
+                        map[r].defense = cap;
+                    }
+                    else{
+                        map[r].defense += up;
+                    }
+                }
             }
-            map[r].defense += up;
+        }
+    }
+    else{
+        for(let r = 0; r < map.length; r++){
+            if(map[r].owner.id > 0){
+                let up = map[r].prod;
+                if(map[r].constShowing){
+                    up += up;
+                }
+                map[r].defense += up;
+            }
         }
     }
 }
@@ -262,50 +291,66 @@ function checkConstLight(gameData){
     }
 }
 
-function getAttackValue(map, play){
-    let defPercent = play.attackStrength;
-    let planPercent = .5;
-    let owned = play.getOwnedIds();
-    let sorted = owned.slice();
-    sorted.sort(function(a, b){return map[b].defense - map[a].defense});
+function getAttackValue(map, play, bucketMode){
+    if(!bucketMode){
+        let defPercent = play.attackStrength;
+        let planPercent = .5;
+        let owned = play.getOwnedIds();
+        let sorted = owned.slice();
+        sorted.sort(function(a, b){return map[b].defense - map[a].defense});
     
-    let count = Math.round(sorted.length * planPercent);
-    let hitValue = 0;
-    for(let r = 0; r < count; r++){
-        if(map[sorted[r]].defense > 0){
-            let scrapeVal = Math.round(map[sorted[r]].defense * defPercent);
-            if(scrapeVal == 0) scrapeVal = 1;
-            hitValue += scrapeVal;
-            map[sorted[r]].defense -= scrapeVal;
+        let count = Math.round(sorted.length * planPercent);
+        let hitValue = 0;
+        for(let r = 0; r < count; r++){
+            if(map[sorted[r]].defense > 0){
+                let scrapeVal = Math.round(map[sorted[r]].defense * defPercent);
+                if(scrapeVal == 0) scrapeVal = 1;
+                hitValue += scrapeVal;
+                map[sorted[r]].defense -= scrapeVal;
+            }
+            // else{
+            //     r--;
+            // }
         }
-        // else{
-        //     r--;
-        // }
+        return hitValue;
     }
-    return hitValue;
+    else{
+        let attackStrength = .025; //CHANGE WHEN PLAYERS CAN ACTUALLY TOGGLE THIS
+        let hitValue = Math.round(play.faction.bucket * attackStrength);
+        play.faction.bucket -= hitValue;
+        return hitValue;
+    }
 }
 
-function calcAttackValue(map, play){
+function calcAttackValue(map, play, bucketMode){
     //For bots to calculate how hard they will hit
-    let defPercent = play.attackStrength;
-    let planPercent = .5;
-    let owned = play.getOwnedIds();
-    let sorted = owned.slice();
-    sorted.sort(function(a, b){return map[b].defense - map[a].defense});
-    
-    let count = Math.round(sorted.length * planPercent);
-    let hitValue = 0;
-    for(let r = 0; r < count; r++){
-        if(map[sorted[r]].defense > 0){
-            let scrapeVal = Math.round(map[sorted[r]].defense * defPercent);
-            if(scrapeVal == 0) scrapeVal = 1;
-            hitValue += scrapeVal;
+    if(!bucketMode){
+        let defPercent = play.attackStrength;
+        let planPercent = .5;
+        let owned = play.getOwnedIds();
+        let sorted = owned.slice();
+        sorted.sort(function(a, b){return map[b].defense - map[a].defense});
+        
+        let count = Math.round(sorted.length * planPercent);
+        let hitValue = 0;
+        for(let r = 0; r < count; r++){
+            if(map[sorted[r]].defense > 0){
+                let scrapeVal = Math.round(map[sorted[r]].defense * defPercent);
+                if(scrapeVal == 0) scrapeVal = 1;
+                hitValue += scrapeVal;
+            }
+            // else{
+            //     r--;
+            // }
         }
-        // else{
-        //     r--;
-        // }
+        return hitValue;
     }
-    return hitValue;
+    else{
+        let attackStrength = .025; //CHANGE WHEN PLAYERS CAN ACTUALLY TOGGLE THIS
+        let hitValue = Math.round(play.faction.bucket * attackStrength);
+        return hitValue;
+    }
+    
 }
 
 function toggleTarget(map, faction, target){
@@ -390,8 +435,8 @@ function checkProximity(targ, map, id){
 
 function move(gameData, target, player){
     let map = gameData.map;
-    let stack = getAttackValue(map, player);
-    let moveEvent = {target: target, attacker: player, defender: 0, type: 0};
+    let stack = getAttackValue(map, player, gameData.bucketMode);
+    let moveEvent = {target: target, attacker: player, defender: 0, type: 0, hitValue: stack};
     if (target.faction.id == player.faction.id){
         target.defense += stack;
         moveEvent.defender = player;
@@ -405,7 +450,6 @@ function move(gameData, target, player){
             target.owner = player;
             player.faction.updateOwned(target, false);
             if(moveEvent.defender.faction.id != 0){
-                console.log("neut!");
                 moveEvent.defender.faction.updateOwned(target, true);
             }
             checkConstLight(gameData);
@@ -476,7 +520,7 @@ function botMove(gameData){
 }
 
 function hourRefresh(gameData){
-    addDefense(gameData.map);
+    addDefense(gameData.map, gameData.bucketMode);
     botMapUpdate(gameData, {type:"production"});
     render(gameData);
 }
@@ -499,5 +543,15 @@ function flightUpdate(gameData){
 }
 
 function startTimers(){
-    
+    defenseUpdater = setInterval(hourRefresh, defenseIntTime, gameData);
+    flightUpdater = setInterval(flightUpdate, flightIntTime, gameData);
+    attackUpdater = setInterval(attackRefresh, attackIntTime, gameData.players);
+    botCaller = setInterval(botMove, botIntTime, gameData);
+}
+
+function pauseTimers(){
+    clearInterval(defenseUpdater);
+    clearInterval(flightUpdater);
+    clearInterval(attackUpdater);
+    clearInterval(botCaller);
 }

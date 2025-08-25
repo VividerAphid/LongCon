@@ -3,8 +3,9 @@ gameData.width = 3500;//4060;
 gameData.height = 3500;//4060;
 gameData.neutCostCap = 1500;
 gameData.map = map;//convertMap(galconSnowflake2());//randomGen(gameData.width, gameData.height);
-gameData.consts = genConsts(gameData.map, 5, 7);
+gameData.consts = genConsts(gameData.map, 6, 8);
 gameData.map = loadDefenseAndNeut(gameData.map, gameData.neutCostCap);
+gameData.bucketMode = bucketModeChx.checked;
 gameData.spectateMode = spectatechx.checked;
 
 //printAllStats(gameData.map, gameData.consts);
@@ -26,12 +27,12 @@ if(gameData.spectateMode == false){
     gameData.humanPlayer.ship = player1Ship;
     gameData.ships[0].player = player1;
 }
-gameData.map = pickSpawns(gameData, Math.floor(Math.random()*50)+1, 0);
+gameData.map = pickSpawns(gameData, 100, 100);//pickSpawns(gameData, Math.floor(Math.random()*50)+1, 0);
 loadFactionsOwned(gameData);
 gameData.coordinators = loadCoordinators(gameData.factions);
 setShipSpawns(gameData);
 
-gameData.botWar = false;
+//gameData.botWar = false;
 gameData.debug = false;
 botStart(gameData);
 
@@ -48,7 +49,4 @@ var defenseUpdater = "";
 var flightUpdater = "";
 var attackUpdater = "";
 var botCaller = "";
-defenseUpdater = setInterval(hourRefresh, defenseIntTime, gameData);
-flightUpdater = setInterval(flightUpdate, flightIntTime, gameData);
-attackUpdater = setInterval(attackRefresh, attackIntTime, gameData.players);
-botCaller = setInterval(botMove, botIntTime, gameData);
+startTimers();

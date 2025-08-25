@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<head>
+    <title>LongCon Dev Sandbox</title>
+</head>
+
+<link rel="stylesheet" href="../main.css">
+<link rel="stylesheet" href="../tab.css">
+<link rel="stylesheet" href="devTools.css">
+
+<script src="../mapkit/delaunator.js"></script>
+<script src="../mapkit/utils.js"></script>
+<script src="../mapkit/randMapBuilder.js"></script>
+<script src="../mapkit/map.js"></script>
+
+<script src="../classes.js"></script>
+<script src="../bots.js"></script>
+<script src="../artist.js"></script>
+<script src="../main.js"></script>
+<script src="../stats.js"></script>
+
+<script src="../ui.js"></script>
+
+
+<body>
+    <div>
+        <div id="tabBar" class="tabBar">
+            <button class="tabLink" id="mapTabBtn" onclick="openTab(event, 'canvasDiv')">Map</button>
+            <button class="tabLink" id="statsTabBtn" onclick="statsTabClick(event, gameData)">Stats</button>
+            <button class="tabLink" id="settingsTabBtn" onclick="openTab(event, 'settingsDiv')">Settings</button>
+        </div>
+        <div id="canvasDiv" class="tabContent">
+            <canvas id="gameboard" class="gameCanvas"></canvas>
+        </div>
+        <div id="statsDiv" class="tabContent">
+            <div id="scoresDiv" class="holder-bordered">
+                Scores:
+                <div id="scoreBox">
+                    Ooops! Scores ded :(       
+                </div>
+            </div>
+        </div>
+        <div id="settingsDiv" class="tabContent">
+            <div id="innerSettings" class="holder-bordered">
+                Settings
+                <br>
+                <label for="minZoomSlider">Minimum Zoom Label Rendering: </label>
+                <input type="range" id="minZoomSlider" min="0" max="3" value="0.6" step="0.1">
+                <input type="number" id="minZoomInp" value=0.6 min=0 max=3 step="0.1">
+                <br>
+                <label for="drawFacLabelsChx">Draw Faction Labels: </label>
+                <input id="drawFacLabelsChx" type="checkbox" checked="true">
+                <br>
+                <label for="drawSpectateShipsChx">Draw Ships in Spectator Mode: </label>
+                <input id="drawSpectateShipsChx" type="checkbox" checked="true">
+            </div>
+            <br>
+            Coming soon
+            <ul>
+                <li>-Pan vs click sensitivity</li>
+                <li>-Minimum click radius for stars</li>
+            </ul>          
+        </div>
+    </div>
+    <button id="devTabBtn">><br>><br>><br></button>
+</body>

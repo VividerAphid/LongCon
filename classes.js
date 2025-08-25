@@ -29,6 +29,7 @@ class star{
         this.y = y;
         this.name = name;
         this.prod = prod;
+        this.defcap = this.prod * 100; //Cap for bucketMode
         this.defense = 0;
         this.owner = {};
         this.connections = cons || []; //list of integers
@@ -47,12 +48,21 @@ class star{
     get colorChars(){
         return this.faction.colorChars;
     }
+    get cap(){
+        if(this.constShowing){
+            return this.defcap * 2;
+        }
+        else{
+            return this.defcap;
+        }
+    }
     get faction(){
         return this.owner.faction;
     }
     set production(val){
         this.prod = val;
         this.calcRad();
+        this.defcap = this.prod * 100;
     }
     calcRad(){
         this.radius = 10*(this.prod/100);
@@ -189,6 +199,7 @@ class faction{
         this.targets = [];
         this.coordinator = "";
         this.owned = [];
+        this.bucket = 1000; //Available hits in bucketMode
     }
     get color(){
         return this.colorSet.color;
@@ -252,6 +263,7 @@ class faction{
 class game{
     constructor(){
         this.spectateMode = false;
+        this.bucketMode = false; //Setting for whether hits are scraped off of star defense or used from a "bucket"
         this.map = [];
         this.consts = [];
         this.factions = [];
