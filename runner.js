@@ -27,7 +27,8 @@ if(gameData.spectateMode == false){
     gameData.humanPlayer.ship = player1Ship;
     gameData.ships[0].player = player1;
 }
-gameData.map = pickSpawns(gameData, 100, 100);//pickSpawns(gameData, Math.floor(Math.random()*50)+1, 0);
+let spawns = (spawnCountinp.value > 0) ? spawnCountinp.value : Math.floor(Math.random()*50)+1
+gameData.map = pickSpawns(gameData, spawns, 0);
 loadFactionsOwned(gameData);
 gameData.coordinators = loadCoordinators(gameData.factions);
 setShipSpawns(gameData);

@@ -251,7 +251,10 @@ function uiSetup(gameData){
 function pickSpawns(gameData, spawnCount, perPlayerMin){
     for(let s = 0; s < spawnCount; s++){
         let prodPick = Math.floor(Math.random()*86) + 15;
-        let defensePick = Math.floor(Math.random()*1500) + (gameData.factions[0].players.length * perPlayerMin);
+        let defensePick = Math.floor(Math.random()*1500);
+        if(!gameData.bucketMode){
+            defensePick += (gameData.factions[0].players.length * perPlayerMin);
+        } 
         for(let r = 0; r < gameData.factions.length; r++){
             let pick = Math.floor(Math.random()*gameData.map.length);
             if(gameData.map[pick].owner.id == 0){
