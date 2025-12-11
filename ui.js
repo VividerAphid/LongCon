@@ -141,6 +141,9 @@ function updateMap(){
             map = convertMap(aphidGalaxy1());
             break;
         case 6:
+            map = convertMap(aphidGalaxy2());
+            break;
+        case 7:
             map = convertMap(microGalaxy());
             break;
     }
@@ -162,14 +165,15 @@ function startBtnClick(){
     menuDiv.style.display = "none";
 }
 
-function minZoomChange(wasSlider){
+function minZoomChange(wasSlider, sliderName, inputName){
     if(wasSlider){
-        minZoomInp.value = minZoomSlider.value;
+        inputName.value = sliderName.value;
     }
     else{
-        minZoomSlider.value = minZoomInp.value;
+        sliderName.value = inputName.value;
     }
     gameData.settings.minLabelDrawDistance = minZoomInp.value * 1;
+    gameData.settings.minProdLabelDrawDistance = minProdZoomInp.value * 1;
 }
 
 function getEventLocation(e)
@@ -301,9 +305,12 @@ function initListeners(gameData){
     gameboard.style.display = "inline";
     tabBar.style.display = "block";
     mapTabBtn.click();
-    minZoomSlider.onchange = function(){minZoomChange(true, gameData);};
-    minZoomInp.onchange = function(){minZoomChange(false, gameData);};
+    minZoomSlider.onchange = function(){minZoomChange(true, minZoomSlider, minZoomInp, gameData);};
+    minZoomInp.onchange = function(){minZoomChange(false, minZoomSlider, minZoomInp, gameData);};
+    minProdZoomSlider.onchange = function(){minZoomChange(true, minProdZoomSlider, minProdZoomInp, gameData);};
+    minProdZoomInp.onchange = function(){minZoomChange(false, minProdZoomSlider, minProdZoomInp, gameData);};
     drawFacLabelsChx.onchange = function(){gameData.settings.drawFactionLabels = drawFacLabelsChx.checked};
+    drawProdLabelsChx.onchange = function(){gameData.settings.drawProdLabels = drawProdLabelsChx.checked};
     drawSpectateShipsChx.onchange = function(){gameData.settings.drawShipsInSpectator = drawSpectateShipsChx.checked};
     gameboard.addEventListener('mousedown', (e) => onPointerDown(e, gameData.artist));
     gameboard.addEventListener('touchstart', (e) => handleTouch(e, onPointerDown, gameData.artist, gameData));

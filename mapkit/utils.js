@@ -152,6 +152,14 @@ function scale(map, scal){
 	return map;
 }
 
+function scaleCoords(coords, scal){
+	for(var r = 0; r < coords.length; r++){
+		coords[r][0] = coords[r][0] * scal;
+		coords[r][1] = coords[r][1] * scal;
+	}
+	return coords;
+}
+
 function shiftX(map, shi){
 	let leng = map.length;
 	for(var r = 0; r < leng; r++){

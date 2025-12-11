@@ -15,7 +15,7 @@
 <script src="bots.js"></script>
 <script src="artist.js"></script>
 <script src="main.js"></script>
-<script src="stats.js"></script>
+<!-- <script src="stats.js"></script> -->
 
 <script src="ui.js"></script>
 
@@ -28,7 +28,8 @@
             <option>Galcon Galaxy 8</option>
             <option>Galcon Snowflake 1</option>
             <option>Galcon Snowflake 2</option>     
-            <option>Aphid Galaxy 1</option>  
+            <option>Aphid Galaxy 1</option>
+            <option>Aphid Galaxy 2</option> 
             <option>Micro Galaxy</option>
         </select>
         <br>
@@ -84,12 +85,19 @@
             <div id="innerSettings" class="holder-bordered">
                 Settings
                 <br>
-                <label for="minZoomSlider">Minimum Zoom Label Rendering: </label>
+                <label for="minZoomSlider">Minimum Zoom Master Label Rendering: </label>
                 <input type="range" id="minZoomSlider" min="0" max="3" value="0.6" step="0.1">
                 <input type="number" id="minZoomInp" value=0.6 min=0 max=3 step="0.1">
                 <br>
+                <label for="minProdZoomSlider">Minimum Zoom Prod Label Rendering: </label>
+                <input type="range" id="minProdZoomSlider" min="0" max="3" value="0.6" step="0.1">
+                <input type="number" id="minProdZoomInp" value=1 min=0 max=3 step="0.1">
+                <br>
+                <label for="drawProdLabelsChx">Draw Prod Labels: </label>
+                <input id="drawProdLabelsChx" type="checkbox" checked="true">
+                <br>
                 <label for="drawFacLabelsChx">Draw Faction Labels: </label>
-                <input id="drawFacLabelsChx" type="checkbox" checked="true">
+                <input id="drawFacLabelsChx" type="checkbox">
                 <br>
                 <label for="drawSpectateShipsChx">Draw Ships in Spectator Mode: </label>
                 <input id="drawSpectateShipsChx" type="checkbox" checked="true">

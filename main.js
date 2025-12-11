@@ -214,8 +214,10 @@ function render(gameData){
         }
         
         if(gameData.artist.cameraZoom >= gameData.settings.minLabelDrawDistance){
+            let drawProdLabels = gameData.artist.cameraZoom >= gameData.settings.minProdLabelDrawDistance;
+            if(document.getElementById("drawProdLabelsChx").checked == false){drawProdLabels = false;}
             for(let r = 0; r < map.length; r++){
-                map[r].drawLabels(gameData.artist, gameData.settings.drawFactionLabels);
+                map[r].drawLabels(gameData.artist, gameData.settings.drawFactionLabels, drawProdLabels);
                 if(gameData.debug){
                     map[r].drawDebugs(gameData.artist);
                 }
@@ -251,7 +253,7 @@ function uiSetup(gameData){
 function pickSpawns(gameData, spawnCount, perPlayerMin){
     for(let s = 0; s < spawnCount; s++){
         let prodPick = Math.floor(Math.random()*86) + 15;
-        let defensePick = Math.floor(Math.random()*1500);
+        let defensePick = (gameData.bucketMode) ? Math.floor(Math.random()*5000) : Math.floor(Math.random()*1500);
         if(!gameData.bucketMode){
             defensePick += (gameData.factions[0].players.length * perPlayerMin);
         } 

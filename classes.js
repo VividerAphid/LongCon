@@ -74,11 +74,11 @@ class star{
     drawStar(art){
         art.drawStar(this.x, this.y, this.color, this.radius);
     }
-    drawLabels(art, drawFactionLabels){
+    drawLabels(art, drawFactionLabels, drawProdLabels){
         let constMult = "";
         if(this.constShowing){constMult = " (x2)"}
-        art.drawText(this.x-this.labelOffsets.dXOffset, this.y-this.labelOffsets.dYOffset, this.defense, art.labelFont, this.color); //Defense label
-        art.drawText(this.x-this.labelOffsets.pXOffset, this.y+this.labelOffsets.pYOffset, "+"+this.prod + constMult, art.labelFont, this.color); //Prod label       
+        art.drawText(this.x-this.labelOffsets.dXOffset, this.y-this.labelOffsets.dYOffset, this.defense, art.labelFont, this.color); //Defense label   
+        if(drawProdLabels){art.drawText(this.x-this.labelOffsets.pXOffset, this.y+this.labelOffsets.pYOffset, "+"+this.prod + constMult, art.labelFont, this.color);} //Prod label       
         if(drawFactionLabels){
             art.drawText(this.x-7, this.y, this.colorChars, art.labelFont, this.colorInverse);
         }
@@ -276,9 +276,10 @@ class game{
         this.height = "";
         this.neutCostCap = 0;
         this.settings = {
-            minLabelDrawDistance : .6,
-            drawShipsInSpectator: true,
-            drawFactionLabels: true,
+            minLabelDrawDistance : document.getElementById("minZoomInp").value * 1,
+            minProdLabelDrawDistance : document.getElementById("minProdZoomInp").value * 1,
+            drawShipsInSpectator: document.getElementById("drawSpectateShipsChx").checked,
+            drawFactionLabels: document.getElementById("drawFacLabelsChx").checked,
         };
     }
 }

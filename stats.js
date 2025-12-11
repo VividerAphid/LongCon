@@ -33,6 +33,14 @@ function calcAvgProfitTime(map){
     return avgTime / map.length;
 }
 
+function calcAvgBucketProfit(map){
+    let avgTime = 0;
+    for(let r = 0; r < map.length; r++){
+        avgTime += map[r].defense / (map[r].cap * .025);
+    }
+    return avgTime / map.length;
+}
+
 function printAllStats(map, consts){
     let rawProd = calcRawProd(map);
     let constProd = calcConstProd(map, consts);

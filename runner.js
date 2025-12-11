@@ -1,11 +1,11 @@
 var gameData = new game();
 gameData.width = 3500;//4060;
 gameData.height = 3500;//4060;
-gameData.neutCostCap = 1500;
+gameData.bucketMode = bucketModeChx.checked;
+gameData.neutCostCap = (gameData.bucketMode) ? 5000:1500;
 gameData.map = map;//convertMap(galconSnowflake2());//randomGen(gameData.width, gameData.height);
 gameData.consts = genConsts(gameData.map, 6, 8);
 gameData.map = loadDefenseAndNeut(gameData.map, gameData.neutCostCap);
-gameData.bucketMode = bucketModeChx.checked;
 gameData.spectateMode = spectatechx.checked;
 
 //printAllStats(gameData.map, gameData.consts);
