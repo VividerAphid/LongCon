@@ -1,0 +1,22 @@
+<html>
+  <head>
+    <meta name="viewport" content="width=device-width,initial-scale=1.0">
+    <title>Longcon Online</title>
+  </head>
+  <script src="test.js"></script>
+  <script src="/socket.io/socket.io.js"></script>
+  <body>
+    Test
+    <script>
+        const socket = io();
+        function increment(){
+            socket.emit('Increment');
+        }
+        socket.on('incValChange', (incVal) => {
+            document.getElementById("incValue").innerHTML = incVal;
+        });
+    </script>
+    <button id="incButton" onclick="increment()">Increment</button>
+    <div id="incValue">0</div>
+  </body>
+</html>

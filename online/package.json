@@ -1,0 +1,10 @@
+{
+  "name": "longcon-online",
+  "version": "0.0.1",
+  "description": "Longcon Online",
+  "type": "commonjs",
+  "dependencies": {
+    "express": "^5.2.1",
+    "socket.io": "^4.8.3"
+  }
+}
