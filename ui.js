@@ -144,7 +144,19 @@ function updateMap(){
             map = convertMap(aphidGalaxy2());
             break;
         case 7:
+            map = convertMap(theX());
+            break;
+        case 8:
             map = convertMap(microGalaxy());
+            break;
+        case 9:
+            map = convertMap(microX());
+            break;
+        case 10:
+            map = convertMap(microEight());
+            break;
+        case 11:
+            map = convertMap(microClusters1());
             break;
     }
 }
