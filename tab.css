@@ -1,29 +1,38 @@
-.tabBar{
-	overflow: hidden;
-  	border: 1px solid #555;
-  	background-color:#444;
+.tabBar {
+    padding: 4px;
+    border: 1px solid var(--border);
+    border-radius: 6px 6px 0 0;
+    background: var(--panel);
 }
-.tabBar button{
-	background-color: #444;
-	color: rgb(175, 174, 174);
-  	float: left;
-  	border: none;
-  	outline: none;
-  	cursor: pointer;
-  	padding: 10px 16px;
-  	transition: 0.3s;
-	font-size: 20px;
+
+.tabBar button {
+    padding: 0.3rem 0.85rem;
+    border: 1px solid transparent;
+    border-radius: 4px;
+    background: transparent;
+    color: var(--muted);
+    cursor: pointer;
 }
-.tabBar button:hover{
-	background-color: #666;
+
+.tabBar button:hover {
+    background: #1a2e48;
+    color: var(--text);
 }
-.tabBar button.active{
-	background-color: #ccc;
-	color: #222;
+
+.tabBar button.active {
+    border-color: #4779a7;
+    background: #23476e;
+    color: #fff;
 }
-.tabContent{
-	display: none;
-  	padding: 6px 12px;
-  	border: 1px solid #ccc;
-  	border-top: none;
+
+.tabContent {
+    display: none;
+    padding: 0.75rem;
+    border: 1px solid var(--border);
+    border-top: none;
+    background: var(--panel);
+}
+
+#canvasDiv {
+    padding: 0;
 }

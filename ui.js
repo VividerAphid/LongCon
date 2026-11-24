@@ -67,8 +67,7 @@ function initFactionListings(){
     for(let r = 0; r < count; r++){
         let el = addElement("fac"+r, "div", factionListing, "Faction"+r +" ");
         let colors = factions[r].colors;
-        el.style.background = colors[0];
-        el.style.color = colors[1];
+        el.style.setProperty("--faction-color", colors[0]);
         let inpSize = 2;
         let rgbDiv = addElement("rgbDiv"+r, "div", el);
         let rDiv = addElement("rDiv"+r, "div", rgbDiv, "R: ");
@@ -97,7 +96,6 @@ function initFactionListings(){
         gDiv.className = "factionRGBEntry";
         bDiv.className = "factionRGBEntry";
         rgbDiv.style.display = "inline";
-        el.style.width = "25%";
     }
 }
 
@@ -307,16 +305,18 @@ function updateTranslationAndZoom(gameData){
 }
 
 function setCanvasDimensions(){
-  gameboard.width = (document.documentElement.clientWidth)*.97;
-  gameboard.height = (document.documentElement.clientHeight)*.9;
+    const tabs = tabBar.getBoundingClientRect();
+    const bottomMargin = parseFloat(getComputedStyle(document.body).marginBottom);
+    gameboard.width = tabBar.clientWidth;
+    gameboard.height = Math.max(1, document.documentElement.clientHeight - Math.ceil(tabs.bottom + bottomMargin) - 1);
 }
 
 function initListeners(gameData){
     window.onresize = setCanvasDimensions;
-    setCanvasDimensions();
     gameboard.style.display = "inline";
     tabBar.style.display = "block";
     mapTabBtn.click();
+    setCanvasDimensions();
     minZoomSlider.onchange = function(){minZoomChange(true, minZoomSlider, minZoomInp, gameData);};
     minZoomInp.onchange = function(){minZoomChange(false, minZoomSlider, minZoomInp, gameData);};
     minProdZoomSlider.onchange = function(){minZoomChange(true, minProdZoomSlider, minProdZoomInp, gameData);};

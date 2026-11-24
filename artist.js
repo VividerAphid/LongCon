@@ -1,7 +1,8 @@
 class artist{
     constructor(ctx){
         this.ctx = ctx;
-        this.labelFont = "bold 15px Consolas";
+        this.labelFont = "bold 14px Consolas, monospace";
+        this.labelColors = new Map();
         this.cameraOffset = {x: this.ctx.canvas.width/2, y: this.ctx.canvas.height/2};
         this.cameraZoom = 1;
         this.maxZoom = 3;
@@ -20,58 +21,51 @@ class artist{
         this.ctx.fillRect(x, y, w, h);
     }
     drawStar(x, y, color, radius){
-        //let radius = 10;
-        this.ctx.beginPath();
-        this.ctx.lineWidth = 1;
-        this.ctx.fillStyle = color;
-        this.ctx.strokeStyle = color;
-        this.ctx.arc(x, y, (radius*2), 0, 2*Math.PI);
-        this.ctx.fill();
-        this.ctx.stroke();
+        const ctx = this.ctx;
+        const size = radius * 2;
+        ctx.beginPath();
+        ctx.arc(x, y, size, 0, 2 * Math.PI);
+        ctx.fillStyle = color;
+        ctx.fill();
+
+        ctx.beginPath();
+        ctx.arc(x - size * 0.12, y - size * 0.14, size * 0.68, 0, 2 * Math.PI);
+        ctx.fillStyle = "rgba(255, 255, 255, 0.24)";
+        ctx.fill();
     }
     drawText(x, y, text, font, colour){
-        this.ctx.fillStyle = colour;
-        this.ctx.strokeStyle = colour;
-        this.ctx.font = font;
-        this.ctx.fillText(text, x, y);
+        const ctx = this.ctx;
+        if(!this.labelColors.has(colour)){
+            ctx.fillStyle = colour;
+            ctx.fillStyle = `color-mix(in srgb, ${colour}, white 28%)`;
+            this.labelColors.set(colour, ctx.fillStyle);
+        }
+        ctx.font = font;
+        ctx.lineWidth = 3;
+        ctx.lineJoin = "round";
+        ctx.strokeStyle = "#08111e";
+        ctx.strokeText(text, x, y);
+        ctx.fillStyle = this.labelColors.get(colour);
+        ctx.fillText(text, x, y);
     }
     drawTriangle(triangle, triangleScale=1){
-        //let triangleScale = 1;
-        let g = this.ctx;
-        let baseWidth = 10;
-        let height = 14;
-        let scaledX = triangle.x * triangleScale;
-        let scaledY = triangle.y * triangleScale;
+        const g = this.ctx;
         g.save();
-        g.lineWidth = 1;
-        g.strokeStyle = triangle.color;
-        g.fillStyle = triangle.color;
-        g.translate(scaledX, scaledY);
+        g.translate(triangle.x * triangleScale, triangle.y * triangleScale);
         g.rotate(-triangle.direction);
-        g.translate(-scaledX, -scaledY);
+        g.scale(triangleScale, triangleScale);
         g.beginPath();
-
-        g.moveTo(scaledX-(baseWidth*triangleScale), scaledY-(height*triangleScale));
-        g.lineTo(scaledX+(baseWidth*triangleScale), scaledY-(height*triangleScale));
-        g.lineTo(scaledX, scaledY+(height*triangleScale));
-
+        g.moveTo(0, 14);
+        g.lineTo(-9, -11);
+        g.lineTo(0, -6);
+        g.lineTo(9, -11);
         g.closePath();
+        g.fillStyle = triangle.color;
         g.fill();
-
         if(triangle.player.isBot == false){
-            //console.log("drawing player");
             g.strokeStyle = "#fff";
-            g.lineWidth = 4;
-            g.translate(scaledX, scaledY);
-            //g.rotate(-triangle.direction);
-            g.translate(-scaledX, -scaledY);
-            g.beginPath();
-
-            g.moveTo(scaledX-(baseWidth*triangleScale), scaledY-(height*triangleScale));
-            g.lineTo(scaledX+(baseWidth*triangleScale), scaledY-(height*triangleScale));
-            g.lineTo(scaledX, scaledY+(height*triangleScale));
-
-            g.closePath();
+            g.lineWidth = 2;
+            g.lineJoin = "round";
             g.stroke();
         }
         g.restore();
@@ -82,18 +76,15 @@ class artist{
         
     }
     drawTargetPointer(x, y, rad){
-        this.ctx.fillStyle = "#f00";
-        this.ctx.strokeStyle = "#f00";
-        this.ctx.lineWidth = 5;
-        this.ctx.moveTo(x, y-(rad+15));
-        this.ctx.lineTo(x, y+(rad+15));
-        this.ctx.moveTo(x-(rad+15), y);
-        this.ctx.lineTo(x+(rad+15), y);
-        this.ctx.stroke();
-
-        this.ctx.fillStyle = "#999";
-        this.ctx.strokeStyle = "#999";
-        this.ctx.lineWidth = 3;
+        const ctx = this.ctx;
+        ctx.beginPath();
+        ctx.arc(x, y, rad * 2 + 5, 0, 2 * Math.PI);
+        ctx.strokeStyle = "#08111e";
+        ctx.lineWidth = 4;
+        ctx.stroke();
+        ctx.strokeStyle = "#ffd166";
+        ctx.lineWidth = 2;
+        ctx.stroke();
     }
     drawPointer(x, y, color){
         let scale = 1;

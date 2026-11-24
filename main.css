@@ -1,23 +1,143 @@
+:root {
+    color-scheme: dark;
+    --page: #08111e;
+    --panel: #101d30;
+    --field: #0a1627;
+    --border: #304863;
+    --text: #e7effa;
+    --muted: #aebfd4;
+    --accent: #87c5ff;
+}
+
 body {
-	color:#fff;
-	background-color:#222;
-	font-size:20px;
-	overflow-y: hidden;
-	overflow: hidden;
-	overscroll-behavior-y: none;
+    margin: 8px;
+    color: var(--text);
+    background: var(--page);
+    font: 16px/1.5 system-ui, sans-serif;
+    overscroll-behavior-y: none;
 }
 
-.factionRGBEntry{
-	display:inline;
+#menuDiv {
+    max-width: 38rem;
+    margin: clamp(0.5rem, 5vh, 3rem) auto;
+    padding: clamp(1rem, 4vw, 2rem);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    background: var(--panel);
 }
 
-.gameCanvas{
-	border: 3px solid #aaa;
+#menuDiv h1 {
+    margin: 0 0 1rem;
+    font-size: 1.75rem;
+    line-height: 1.15;
 }
 
-.holder-bordered{
-	display: inline-block;
-    border: 3px solid #aaa;
-	border-radius: 5px;
-	padding: 10px 10px;
+#menuDiv > label {
+    display: inline-block;
+    min-width: 10rem;
+    margin-block: 0.4rem;
+}
+
+#menuDiv small {
+    display: inline-block;
+    color: var(--muted);
+}
+
+button,
+select,
+input {
+    color: inherit;
+    font: inherit;
+}
+
+select,
+input[type="number"],
+.factionRGBEntry input {
+    box-sizing: border-box;
+    padding: 0.25rem 0.45rem;
+    border: 1px solid var(--border);
+    border-radius: 5px;
+    background: var(--field);
+    color: var(--text);
+}
+
+input[type="number"] {
+    width: 4.75rem;
+}
+
+input[type="checkbox"],
+input[type="range"] {
+    accent-color: var(--accent);
+}
+
+:is(button, select, input):focus-visible {
+    outline: 2px solid var(--accent);
+    outline-offset: 2px;
+}
+
+#factionListing {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(min(100%, 15rem), 1fr));
+    gap: 0.4rem;
+    margin-bottom: 0.5rem;
+}
+
+#factionListing > div {
+    padding: 0.35rem 0.5rem;
+    border-inline-start: 4px solid var(--faction-color);
+    border-radius: 5px;
+    background: var(--field);
+    font-size: 0.875rem;
+}
+
+.factionRGBEntry {
+    display: inline-block;
+    margin-inline-start: 0.25rem;
+}
+
+.factionRGBEntry input {
+    width: 2.5rem;
+    padding-inline: 0.25rem;
+}
+
+#startBtn {
+    margin-top: 0.75rem;
+    padding: 0.4rem 1.4rem;
+    border: 1px solid transparent;
+    border-radius: 6px;
+    background: var(--accent);
+    color: var(--page);
+    font-weight: 700;
+    cursor: pointer;
+}
+
+#startBtn:hover {
+    background: #b0d9ff;
+}
+
+.gameCanvas {
+    display: block;
+    vertical-align: top;
+    touch-action: none;
+    background-color: #050c19;
+    background-image:
+        radial-gradient(circle at 19px 33px, #7992ae 0.6px, transparent 1px),
+        radial-gradient(circle at 77px 19px, #3a526d 0.6px, transparent 1px),
+        radial-gradient(circle at 41px 86px, #536f8d 0.6px, transparent 1px),
+        radial-gradient(circle at 103px 61px, #364760 0.8px, transparent 1.2px);
+    background-size: 151px 109px, 173px 137px, 127px 163px, 199px 149px;
+}
+
+.holder-bordered {
+    display: inline-block;
+    padding: 0.65rem 0.75rem;
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    background: var(--field);
+}
+
+@media (max-width: 36rem) {
+    #menuDiv > label {
+        min-width: 0;
+    }
 }

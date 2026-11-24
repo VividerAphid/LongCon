@@ -87,34 +87,28 @@ class star{
         art.drawText(this.x-10, this.y, this.id, art.labelFont, "#f00");
     }
     drawConnections(art, map){
+        const ctx = art.ctx;
         let reps = this.connections.length;
         for(let r = 0; r < reps; r++){
             let connectee = map[this.connections[r]].id;
             if(connectee > this.id){
-                art.ctx.beginPath();
-                art.ctx.lineWidth = 3;
-                art.ctx.fillStyle = "#999";
-                art.ctx.strokeStyle = "#999";
+                ctx.beginPath();
+                ctx.lineWidth = 1.5;
+                ctx.strokeStyle = "#536b86";
                 if(this.faction.id != 0 && this.faction.id == map[connectee].faction.id){
                     if(this.constShowing == true && map[connectee].constShowing == true && this.constId == map[connectee].constId){
-                        art.ctx.fillStyle = "#fff";
-                        art.ctx.strokeStyle = "#fff";
-                        art.ctx.lineWidth = 7;
+                        ctx.strokeStyle = "#dcecff";
+                        ctx.lineWidth = 4;
                     }
                     else{
-                        art.ctx.fillStyle = this.color;
-                        art.ctx.strokeStyle = this.color;
+                        ctx.strokeStyle = this.color;
+                        ctx.globalAlpha = 0.75;
                     }
                 }
-                else{
-                art.ctx.fillStyle = "#999";
-                art.ctx.strokeStyle = "#999";
-                //G.fillStyle = "#f0f";
-                //G.strokeStyle = "#f0f"; //FOR TESTING    
-                }
-                art.ctx.moveTo(this.x, this.y);
-                art.ctx.lineTo(map[connectee].x, map[connectee].y);
-                art.ctx.stroke();
+                ctx.moveTo(this.x, this.y);
+                ctx.lineTo(map[connectee].x, map[connectee].y);
+                ctx.stroke();
+                ctx.globalAlpha = 1;
             }
         }
     }
